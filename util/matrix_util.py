@@ -70,6 +70,12 @@ def vector_dot_product(v1, v2):
 
 # --------------------------- outer product of two vectors ---------------------------
 def vector_outer_product(v1, v2):
+    # if any of the vectors is passed as a matrix (list of lists) unwrap it before processing
+    if type(v1) == list and type(v1[0]) == list:
+        v1 = v1[0]
+    if type(v2) == list and type(v2[0]) == list:
+        v2 = v2[0]
+
     output = []
     for m in range(len(v1)):
         output_row = []

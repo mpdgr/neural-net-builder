@@ -1,6 +1,5 @@
 from unittest import TestCase
-
-import matrix_util
+from util import matrix_util
 
 
 class TestMatrixUtil(TestCase):
