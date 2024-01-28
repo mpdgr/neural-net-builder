@@ -1,3 +1,4 @@
+import random
 from enum import Enum, auto
 from util.matrix_util import *
 
@@ -31,8 +32,10 @@ class Layer:
         self.weights = weights
         self.__alpha = alpha
         # self.__debug = debug
-        if weights == "rand":
+        if weights == "const":
             self.init_constant_weights(0.5)
+        else:
+            self.init_random_weights()
 
     def forward_pass(self, inp):
         # prediction for each node
@@ -41,7 +44,6 @@ class Layer:
             print(f"Forwarding prediction: {prediction}")
         return self.__prediction
 
-    # used for middle layers
     def backward_pass(self, delta):
         self.__delta = delta
         # weigh delta to adjust weights
@@ -52,30 +54,6 @@ class Layer:
             print(f"Backpropagating deltas: {self.__back_deltas}")
         return self.__back_deltas
 
-    # used for input layer
-    def _consume_delta(self, delta):
-        if self.debug:
-            print(f"Input layer received deltas: {self.__back_deltas}")
-
-    # used for output layer
-    def output_round(self, inp, target):
-        # prediction for each node
-        self.__predict(inp)
-        # delta for each node
-        self.__comp_delta(target)
-        # weigh delta to adjust weights
-        self.__comp_weight_delta()
-        self.__comp_back_deltas()
-        self.__adjust_weights()
-        if self.debug:
-            print(f"Back propagate deltas: {self.__back_deltas}")
-        return self.__back_deltas
-
-    # used for input layer
-    def _input_pass(self, inp):
-        self.__inp = inp
-        return inp
-
     # comp prediction basing on input and weights
     # inp size = node_count
     def __predict(self, inp):
@@ -84,13 +62,6 @@ class Layer:
         if self.debug:
             print(f"Prediction: {self.__prediction}")
         return self.__prediction
-
-    # comp delta = prediction - expected value
-    # result size = node_count
-    def __comp_delta(self, target):
-        self.__delta = subtract_vectors(self.__prediction, target)
-        if self.debug:
-            print(f"Delta: {self.__delta}")
 
     # comp weighted delta and apply alpha  = delta * input * alpha
     def __comp_weight_delta(self):
@@ -129,6 +100,18 @@ class Layer:
             row = []
             for n in range(self.node_count):
                 row.append(const)
+            weights.append(row)
+
+        self.weights = weights
+        if self.debug:
+            print(f"Initialized weights: {self.weights}")
+
+    def init_random_weights(self):
+        weights = []
+        for r in range(self.input_count):
+            row = []
+            for n in range(self.node_count):
+                row.append(random.random())
             weights.append(row)
 
         self.weights = weights

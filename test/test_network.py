@@ -4,7 +4,7 @@ from network import Network
 
 class TestNetwork(TestCase):
 
-    def test_learn(self):
+    def test_learn_2x2x2(self):
         layers = [2, 2, 2]
 
         inp = [1, 2]
@@ -49,6 +49,98 @@ class TestNetwork(TestCase):
 
         self.assertEqual(weights1_expected, weights1_actual)
         self.assertEqual(weights2_expected, weights2_actual)
+
+    def test_learn_3x2(self):
+        layers = [3, 2]
+
+        inp = [1, 2, 3]
+        target = [20, 15]
+
+        weights = [
+            [1, 1.5],
+            [2, 2.5],
+            [3, 3.5]
+        ]
+
+        network = Network(layers, True)
+        network.layers[1].weights = weights
+
+        print(f"Start weights: ")
+        network.print_weights()
+        network.learn(inp, target)
+        print(f"End weights: ")
+        network.print_weights()
+
+        weights_expected = [
+            [1.6, 1.3],
+            [3.2, 2.1],
+            [4.8, 2.9]
+        ]
+
+        weights_actual = network.layers[1].weights
+
+        # round matrices for float rounding error
+        round_matrix(weights_actual, 10)
+
+        self.assertEqual(weights_expected, weights_actual)
+
+    def test_learn_3x1(self):
+        layers = [2, 3]
+
+        inp = [1, 2, 3]
+        target = [20]
+
+        weights = [
+            [1],
+            [2],
+            [3]
+        ]
+
+        expected = [1.6, 3.2, 4.8]
+
+        network = Network(layers, True)
+        network.layers[1].weights = weights
+
+        print(f"Start weights: ")
+        network.print_weights()
+        network.learn(inp, target)
+        print(f"End weights: ")
+        network.print_weights()
+
+        weights_expected = [
+            [1.6],
+            [3.2],
+            [4.8]
+        ]
+
+        weights_actual = network.layers[1].weights
+
+        # round matrices for float rounding error
+        round_matrix(weights_actual, 10)
+
+        self.assertEqual(weights_expected, weights_actual)
+
+    def test_learn(self):
+        layers = [100, 400, 800, 600, 200, 400, 300, 250, 1000, 25]
+
+        inp = [
+            1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+            1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+            1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+            1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+            1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20
+        ]
+        target = [
+            20, 40, 60, 80, 100,
+            20, 40, 60, 80, 100,
+            20, 40, 60, 80, 100,
+            20, 40, 60, -80, 100,
+            20, 40, 60, 80, 100
+        ]
+
+        network = Network(layers, True)
+
+        network.learn(inp, target)
 
 
 def round_matrix(matrix, precision):
