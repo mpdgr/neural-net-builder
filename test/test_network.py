@@ -142,6 +142,31 @@ class TestNetwork(TestCase):
 
         network.learn(inp, target)
 
+    def test_3x4x1(self):
+        # ok: 300 iteracji/ layers = [3, 4, 4, 1]
+        # ok: 500 iteracji/ layers = [3, 4, 2, 1]
+
+        layers = [3, 4, 2, 1]
+
+        inputs = [
+            [1, 0, 1],
+            [0, 1, 1],
+            [0, 0, 1],
+            [1, 1, 1]
+        ]
+
+        outputs = [[1], [1], [0], [0]]
+
+        network = Network(layers, True)
+
+        for iteration in range(500):
+            for i in range(0, len(inputs)):
+                network.learn(inputs[i], outputs[i])
+
+        for i in range(0, len(inputs)):
+            print(f"\n----->Prediction for: {inputs[i]}; expected: {outputs[i]}")
+            network.predict(inputs[i])
+
 
 def round_matrix(matrix, precision):
     for i in range(len(matrix)):

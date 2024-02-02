@@ -1,5 +1,6 @@
 from layer import Layer
 from util.matrix_util import subtract_vectors
+from activation import *
 
 
 class Network:
@@ -21,7 +22,7 @@ class Network:
             if i == 0:
                 layers.append(Layer(nodes[0], 0, Layer.Location.INPUT))
             elif i < layers_count - 1:
-                layers.append(Layer(nodes[i], nodes[i - 1], Layer.Location.HIDDEN))
+                layers.append(Layer(nodes[i], nodes[i - 1], Layer.Location.HIDDEN, relu))
             else:
                 layers.append(Layer(nodes[i], nodes[i - 1], Layer.Location.OUTPUT))
 

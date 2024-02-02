@@ -1,5 +1,5 @@
 import random
-from enum import Enum, auto
+from activation import *
 from util.matrix_util import *
 
 
@@ -21,13 +21,15 @@ class Layer:
     __back_deltas = None
     __inp = None
     __alpha = None
+    activation = relu
 
     debug = True
 
-    def __init__(self, node_count, input_count, location, weights="rand", alpha=0.1, debug=False):
+    def __init__(self, node_count, input_count, location, activation=None, weights="rand", alpha=0.1, debug=False):
         self.node_count = node_count
         self.input_count = input_count
         self.location = location
+        self.activation = activation
         # todo: rand weight optional
         self.weights = weights
         self.__alpha = alpha
@@ -38,14 +40,24 @@ class Layer:
             self.init_random_weights()
 
     def forward_pass(self, inp):
-        # prediction for each node
-        prediction = self.__predict(inp)
+        # raw prediction for each node
+        raw_prediction = self.__predict(inp)
+        # apply activation function
+        if self.activation is not None:
+            self.__prediction = self.activation(raw_prediction, ActivationType.FUNCTION)
         if self.debug:
-            print(f"Forwarding prediction: {prediction}")
+            print(f"Forwarding prediction: {self.__prediction}")
         return self.__prediction
 
     def backward_pass(self, delta):
         self.__delta = delta
+        # apply activation function in backpropagation
+        if self.activation is not None:
+            # compute derivative for input
+            derivative_vector = self.activation(self.__prediction, ActivationType.DERIVATIVE)
+            # multiply deltas by derivatives
+            adjusted_delta = vector_element_wise_product(delta, derivative_vector)
+            self.__delta = adjusted_delta
         # weigh delta to adjust weights
         self.__comp_weight_delta()
         self.__comp_back_deltas()
@@ -54,7 +66,7 @@ class Layer:
             print(f"Backpropagating deltas: {self.__back_deltas}")
         return self.__back_deltas
 
-    # comp prediction basing on input and weights
+    # comp prediction basing on input and weights, apply activation function
     # inp size = node_count
     def __predict(self, inp):
         self.__inp = inp
@@ -69,13 +81,6 @@ class Layer:
         self.__weighted_delta_alpha = matrix_scalar_product(self.__weighted_delta, self.__alpha)
         if self.debug:
             print(f"Weighted delta alpha {self.__weighted_delta_alpha}")
-
-    # comp delta shares to back propagate -> delta * weight for each input node connection
-    # not required for learning round - logic included in @comp_back_delta_nodes
-    def __comp_back_delta_for_weights(self):
-        self.__deltas_share = vector_matrix_row_wise_product(self.__delta, self.weights)
-        if self.debug:
-            print(f"Delta shares partial: {self.__deltas_share}")
 
     # comp summed deltas to back propagate to each of input nodes
     # -> sum of delta shares for each input nodes
