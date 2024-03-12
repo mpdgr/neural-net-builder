@@ -1,5 +1,6 @@
 import random
 from activation import *
+from dropout import *
 from util.matrix_util import *
 
 
@@ -22,6 +23,7 @@ class Layer:
     __inp = None
     __alpha = None
     activation = relu
+    dropout_rate = 0
 
     debug = True
 
@@ -39,12 +41,15 @@ class Layer:
         else:
             self.init_random_weights()
 
-    def forward_pass(self, inp):
+    def forward_pass(self, inp, training=False):
         # raw prediction for each node
         raw_prediction = self.__predict(inp)
         # apply activation function
         if self.activation is not None:
             self.__prediction = self.activation(raw_prediction, ActivationType.FUNCTION)
+        if training:
+            print("training")
+            self.__prediction = apply_dropout(self.dropout_rate, self.__prediction)
         if self.debug:
             print(f"Forwarding prediction: {self.__prediction}")
         return self.__prediction

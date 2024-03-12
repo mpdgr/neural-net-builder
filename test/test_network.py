@@ -20,7 +20,7 @@ class TestNetwork(TestCase):
             [3.5, 4]
         ]
 
-        network = Network(layers, True)
+        network = Network(layers, [0, 0], True)
         network.layers[1].weights = weights1
         network.layers[2].weights = weights2
 
@@ -62,7 +62,7 @@ class TestNetwork(TestCase):
             [3, 3.5]
         ]
 
-        network = Network(layers, True)
+        network = Network(layers, [0], True)
         network.layers[1].weights = weights
 
         print(f"Start weights: ")
@@ -98,7 +98,7 @@ class TestNetwork(TestCase):
 
         expected = [1.6, 3.2, 4.8]
 
-        network = Network(layers, True)
+        network = Network(layers, [], True)
         network.layers[1].weights = weights
 
         print(f"Start weights: ")
@@ -138,7 +138,7 @@ class TestNetwork(TestCase):
             20, 40, 60, 80, 100
         ]
 
-        network = Network(layers, True)
+        network = Network(layers, [], True)
 
         network.learn(inp, target)
 
@@ -157,7 +157,7 @@ class TestNetwork(TestCase):
 
         outputs = [[1], [1], [0], [0]]
 
-        network = Network(layers, True)
+        network = Network(layers, [], True)
 
         for iteration in range(500):
             for i in range(0, len(inputs)):
@@ -166,6 +166,59 @@ class TestNetwork(TestCase):
         for i in range(0, len(inputs)):
             print(f"\n----->Prediction for: {inputs[i]}; expected: {outputs[i]}")
             network.predict(inputs[i])
+
+
+    def test_3x4x1_with_dropout(self):
+        # w miarę ok: 300 iteracji
+        # layers = [3, 8, 2, 1]
+        # dropout = [0, 0.3, 0]
+
+        layers = [3, 8, 2, 1]
+        dropout = [0, 0.3, 0]
+
+        inputs = [
+            [1, 0, 1],
+            [0, 1, 1],
+            [0, 0, 1],
+            [1, 1, 1]
+        ]
+
+        outputs = [[1], [1], [0], [0]]
+
+        network = Network(layers, dropout, True)
+
+        for iteration in range(300):
+            for i in range(0, len(inputs)):
+                network.learn(inputs[i], outputs[i])
+
+        for i in range(0, len(inputs)):
+            print(f"\n----->Prediction for: {inputs[i]}; expected: {outputs[i]}")
+            network.predict(inputs[i])
+
+    def test_dropout_set(self):
+        layers = [3, 4, 2, 1]
+        network = Network(layers, [], True)
+
+        self.assertEqual(network.layers[0].dropout_rate, 0)
+
+        layers = [3, 4, 2, 1]
+        network = Network(layers, [0.3, 0.4, 0.2], True)
+
+        self.assertEqual(network.layers[0].dropout_rate, 0.3)
+        self.assertEqual(network.layers[1].dropout_rate, 0.4)
+        self.assertEqual(network.layers[2].dropout_rate, 0.2)
+        self.assertEqual(network.layers[3].dropout_rate, 0)
+
+        layers = [3, 4, 2, 1]
+        network = Network(layers, [0.3, 0.4, 0.2], True)
+
+        self.assertEqual(network.layers[0].dropout_rate, 0.3)
+        self.assertEqual(network.layers[1].dropout_rate, 0.4)
+        self.assertEqual(network.layers[2].dropout_rate, 0.2)
+        self.assertEqual(network.layers[3].dropout_rate, 0)
+
+        layers = [3, 4, 2, 1]
+        network = Network(layers, [0.3, 0.4, 0.2, 0.3], True)
 
 
 def round_matrix(matrix, precision):
