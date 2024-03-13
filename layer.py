@@ -45,13 +45,15 @@ class Layer:
     def forward_pass(self, inp, training=False):
         # raw prediction for each node
         raw_prediction = self.__predict(inp)
+        if training:
+            print("training")
+            raw_prediction = apply_dropout(self.dropout_rate, raw_prediction)
+        # todo: clean updating predictions
         self.__raw_prediction = raw_prediction
+        self.__prediction = raw_prediction
         # apply activation function
         if self.activation is not None:
             self.__prediction = self.activation(raw_prediction, ActivationType.FUNCTION)
-        if training:
-            print("training")
-            self.__prediction = apply_dropout(self.dropout_rate, self.__prediction)
         if self.debug:
             print(f"Forwarding prediction: {self.__prediction}")
         return self.__prediction
