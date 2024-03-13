@@ -15,6 +15,7 @@ class Layer:
     location = None
     weights = None
     __prediction = None
+    __raw_prediction = None
     __delta = None
     __weighted_delta = None
     __weighted_delta_alpha = None
@@ -44,6 +45,7 @@ class Layer:
     def forward_pass(self, inp, training=False):
         # raw prediction for each node
         raw_prediction = self.__predict(inp)
+        self.__raw_prediction = raw_prediction
         # apply activation function
         if self.activation is not None:
             self.__prediction = self.activation(raw_prediction, ActivationType.FUNCTION)
@@ -59,7 +61,7 @@ class Layer:
         # apply activation function in backpropagation
         if self.activation is not None:
             # compute derivative for input
-            derivative_vector = self.activation(self.__prediction, ActivationType.DERIVATIVE)
+            derivative_vector = self.activation(self.__raw_prediction, ActivationType.DERIVATIVE)
             # multiply deltas by derivatives
             adjusted_delta = vector_element_wise_product(delta, derivative_vector)
             self.__delta = adjusted_delta
