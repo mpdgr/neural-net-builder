@@ -85,3 +85,39 @@ def __sig(x):
 
 def __sig_deriv(x):
     return __sig(x) * (1 - __sig(x))
+
+# tanh
+
+def tanh(vector, activation):
+    if activation == ActivationType.FUNCTION:
+        return __tanh_vector(vector)
+    elif activation == ActivationType.DERIVATIVE:
+        return __tanh_deriv_vector(vector)
+    else:
+        print("Activation type not valid")
+
+
+def __tanh_vector(v):
+    if type(v) == list and type(v[0]) == list:
+        v = v[0]
+
+    for i in range(0, len(v)):
+        v[i] = __tanh(v[i])
+    return v
+
+
+def __tanh_deriv_vector(v):
+    if type(v) == list and type(v[0]) == list:
+        v = v[0]
+
+    for i in range(0, len(v)):
+        v[i] = __tanh_deriv(v[i])
+    return v
+
+
+def __tanh(x):
+    return (2 / (1 + math.exp(-2 * x))) - 1
+
+
+def __tanh_deriv(x):
+    return 1 - math.pow(__tanh(x), 2)

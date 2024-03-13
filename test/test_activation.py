@@ -34,6 +34,23 @@ class Test(TestCase):
         actual = sig(vector, ActivationType.DERIVATIVE)
 
         self.assertEqual(expected, round_vector(actual, 5))
+        
+    
+    def test_tanh_vector(self):
+        vector = [-1, 0, 2]
+        expected = [-0.76159, 0, 0.96403]
+
+        actual = tanh(vector, ActivationType.FUNCTION)
+
+        self.assertEqual(expected, round_vector(actual, 5))
+
+    def test_tanh_vector_derivative(self):
+        vector = [-1, 0, 2]
+        expected = [0.41997, 1, 0.07065]
+
+        actual = tanh(vector, ActivationType.DERIVATIVE)
+
+        self.assertEqual(expected, round_vector(actual, 5))
 
 
 
