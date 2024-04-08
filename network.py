@@ -21,7 +21,7 @@ class Network:
             print("Network must include at lease two layers")
             return
 
-        print(f"Initializing network - nodes count: {layers_count}")
+        print(f"Initializing network - layers count: {layers_count}")
 
         # init layers
         layers = []
@@ -29,9 +29,10 @@ class Network:
             if i == 0:
                 layers.append(Layer(nodes[0], 0, Layer.Location.INPUT))
             elif i < layers_count - 1:
-                layers.append(Layer(nodes[i], nodes[i - 1], Layer.Location.HIDDEN, relu))
+                # todo: activation array
+                layers.append(Layer(nodes[i], nodes[i - 1], Layer.Location.HIDDEN))
             else:
-                layers.append(Layer(nodes[i], nodes[i - 1], Layer.Location.OUTPUT))
+                layers.append(Layer(nodes[i], nodes[i - 1], Layer.Location.OUTPUT, tanh))
 
         # set layers dropouts
         if len(dropout) > 0:
@@ -81,7 +82,7 @@ class Network:
         prediction = self.predict(inp, True)
         delta = self.__comp_delta(prediction, target)
         self.back_propagate(delta)
-        self.print_weights()
+        # self.print_weights()
 
     # comp delta = prediction - expected value
     # result size = last layer node count

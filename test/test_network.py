@@ -145,6 +145,7 @@ class TestNetwork(TestCase):
     def test_3x4x1(self):
         # ok: 300 iteracji/ layers = [3, 4, 4, 1]
         # ok: 500 iteracji/ layers = [3, 4, 2, 1]
+        # dziala na relu i tanh
 
         layers = [3, 4, 2, 1]
 
@@ -169,9 +170,10 @@ class TestNetwork(TestCase):
 
 
     def test_3x4x1_with_dropout(self):
-        # w miarę ok: 300 iteracji
+        # w miarę ok: 300 iteracji -> wynik zbliżony lub same 0
         # layers = [3, 8, 2, 1]
         # dropout = [0, 0.3, 0]
+        # dziala na relu
 
         layers = [3, 8, 2, 1]
         dropout = [0, 0.3, 0]

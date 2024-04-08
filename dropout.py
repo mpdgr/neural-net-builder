@@ -5,7 +5,7 @@ from util.matrix_util import *
 
 # --------------------------- apply dropout to output vector ---------------------------
 def apply_dropout(dropout_rate, v):
-    if len(v) <= 1:
+    if len(v) <= 1 and dropout_rate != 0:
         print("Output vector must consist of at least 2 elements")
         return v
     if dropout_rate >= 1 or dropout_rate < 0:
