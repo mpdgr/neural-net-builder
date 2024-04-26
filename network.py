@@ -12,10 +12,14 @@ class Network:
     # dropout array length must equal layers array - 1 (no dropout on output layer)
     dropout = []
 
+    # activation array
+    # activation array length must equal layers array - 1 (no activation on input layer)
+    activation = []
+
     layers_count = None
     debug = False
 
-    def __init__(self, nodes, dropout, debug=False):
+    def __init__(self, nodes, dropout=None, activation=None, debug=False):
         layers_count = len(nodes)
         if layers_count < 2:
             print("Network must include at lease two layers")
@@ -29,13 +33,12 @@ class Network:
             if i == 0:
                 layers.append(Layer(nodes[0], 0, Layer.Location.INPUT))
             elif i < layers_count - 1:
-                # todo: activation array
                 layers.append(Layer(nodes[i], nodes[i - 1], Layer.Location.HIDDEN))
             else:
-                layers.append(Layer(nodes[i], nodes[i - 1], Layer.Location.OUTPUT, tanh))
+                layers.append(Layer(nodes[i], nodes[i - 1], Layer.Location.OUTPUT))
 
         # set layers dropouts
-        if len(dropout) > 0:
+        if dropout is not None:
             if len(dropout) != len(layers) - 1:
                 print("Dropout array length must equal layers array - 1")
                 return
@@ -43,8 +46,23 @@ class Network:
                 for i in range(layers_count - 1):
                     layers[i].dropout_rate = dropout[i]
 
+        # set activation functions
+        if activation is not None:
+            if len(activation) != len(layers) - 1:
+                print("Activation array length must equal layers array - 1")
+                return
+            else:
+                layers[0].activation = none
+                for i in range(layers_count - 1):
+                    layers[i + 1].activation = activation[i]
+        else:
+            for i in range(layers_count):
+                layers[i].activation = none
+
         self.layers = layers
         self.layers_count = layers_count
+        self.dropout = dropout
+        self.activation = activation
         self.debug = debug
 
         if debug:

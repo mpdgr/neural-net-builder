@@ -123,3 +123,9 @@ def __tanh(x):
 
 def __tanh_deriv(x):
     return 1 - math.pow(__tanh(x), 2)
+
+
+# none
+
+def none(vector, activation):
+    return vector

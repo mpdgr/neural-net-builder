@@ -1,5 +1,6 @@
 from unittest import TestCase
 from activation import *
+from network import Network
 
 
 class Test(TestCase):
@@ -34,8 +35,7 @@ class Test(TestCase):
         actual = sig(vector, ActivationType.DERIVATIVE)
 
         self.assertEqual(expected, round_vector(actual, 5))
-        
-    
+
     def test_tanh_vector(self):
         vector = [-1, 0, 2]
         expected = [-0.76159, 0, 0.96403]
@@ -52,6 +52,24 @@ class Test(TestCase):
 
         self.assertEqual(expected, round_vector(actual, 5))
 
+    def test_activation_setting(self):
+        activation_array = [relu, sig, tanh, none]
+        network_activation = Network([3, 3, 3, 3, 3], None, activation_array)
+        activations_expected = [none, relu, sig, tanh, none]
+        activations_actual = []
+
+        for layer in network_activation.layers:
+            activations_actual.append(layer.activation)
+
+        network_no_activation = Network([3, 3, 3, 3, 3])
+        no_activations_expected = [none, none, none, none, none]
+        no_activations_actual = []
+
+        for layer in network_no_activation.layers:
+            no_activations_actual.append(layer.activation)
+
+        self.assertEqual(activations_expected, activations_actual)
+        self.assertEqual(no_activations_expected, no_activations_actual)
 
 
 def round_vector(vector, precision):
