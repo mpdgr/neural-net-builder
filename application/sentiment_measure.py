@@ -33,25 +33,44 @@ for i in range(reviews_count):
 
 assert len(reviews_scores) == reviews_count
 
-# create tokens set
+# create vocabulary
 
-vocabulary_raw = set()
-vocabulary = set()
+vocabulary_raw = list()
+vocabulary = dict()
 
 for review in reviews:
-    vocabulary_raw.update(review.split(" "))
+    vocabulary_raw.extend(review.split(" "))
 
-print(f'Created raw set of {len(vocabulary_raw)}')
+print(f'Created raw set of {len(vocabulary_raw)} words')
 
 for item in vocabulary_raw:
     if len(item.strip()) > 1:
-        vocabulary.add(item.strip())
+        if item.strip() not in vocabulary:
+            vocabulary[item.strip()] = 0
+        else:
+            vocabulary[item.strip()] = vocabulary[item.strip()] + 1
 
-print(f'Created cleaned set of {len(vocabulary)}')
+print(f'Created cleaned map of {len(vocabulary.keys())}')
 
-vocabulary_list = list(vocabulary)
+count0 = sum(1 for value in vocabulary.values() if value > 0)
+count5 = sum(1 for value in vocabulary.values() if value >= 5)
+count10 = sum(1 for value in vocabulary.values() if value >= 10)
+count20 = sum(1 for value in vocabulary.values() if value >= 20)
+count50 = sum(1 for value in vocabulary.values() if value >= 50)
+count100 = sum(1 for value in vocabulary.values() if value >= 100)
+
+print(f'Nr of words with any incidence: {count0}')
+print(f'Nr of words with incidence >= 5: {count5}')
+print(f'Nr of words with incidence >= 10: {count10}')
+print(f'Nr of words with incidence >= 20: {count20}')
+print(f'Nr of words with incidence >= 50: {count50}')
+print(f'Nr of words with incidence >= 100: {count100}')
+
+vocabulary_list = list(key for key, value in vocabulary.items() if value >= 100)
 
 vocabulary_size = len(vocabulary_list)
+
+print(f'Nr of words in vocabulary: {vocabulary_size}')
 
 word_index = dict()
 
@@ -72,9 +91,12 @@ for review in reviews:
 
     review_vectors.append(review_vector)
 
-print(review_vectors[0])
+# print(review_vectors[0])
 
 assert len(review_vectors) == reviews_count
+
+print(f'Nr of words in training set: {reviews_count}')
+print(f'Datapoint length: {len(review_vectors[0])}')
 
 
 def map_score(label):
@@ -93,17 +115,17 @@ assert len(review_vectors) == len(scores)
 
 # select training data
 
-# training_reviews = review_vectors[0:23999]
-# training_scores = scores[0:23999]
+training_reviews = review_vectors[0:7000]
+training_scores = scores[0:7000]
 
-training_reviews = review_vectors[0:23000]
-training_scores = scores[0:23000]
+# training_reviews = review_vectors[0:3000]
+# training_scores = scores[0:3000]
 
 print('Created training data')
 
 # select test data
-test_reviews = review_vectors[23000:25000]
-test_scores = scores[23000:25000]
+test_reviews = review_vectors[24000:25000]
+test_scores = scores[24000:25000]
 
 print('Created test data')
 
@@ -140,9 +162,9 @@ for i in range(len(test_reviews)):
     print(f'Prediction: {predicted}')
     print(f'Actual: {test_scores[i]}')
 
-    if (real == [1] and predicted[0] > 0.5) or (real == [0] and predicted[0] < -0.5):
+    if (real == [1] and predicted[0] > 0.1) or (real == [0] and predicted[0] < -0.1):
         verify.append(1)
-    elif (predicted[0] <= 0.5) and (predicted[0] >= -0.5):
+    elif (predicted[0] <= 0.1) and (predicted[0] >= -0.1):
         verify.append(0)
     else:
         verify.append(-1)
