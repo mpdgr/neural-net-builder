@@ -23,7 +23,7 @@ class Layer:
     __back_deltas = None
     __inp = None
     __alpha = None
-    activation = relu
+    activation = None
     dropout_rate = 0
 
     debug = True
@@ -80,8 +80,8 @@ class Layer:
     def __predict(self, inp):
         self.__inp = inp
         self.__prediction = matrix_product(inp, self.weights)
-        # if self.debug:
-        #     print(f"Prediction: {self.__prediction}")
+        if self.debug:
+            print(f"Prediction: {self.__prediction}")
         return self.__prediction
 
     # comp weighted delta and apply alpha  = delta * input * alpha

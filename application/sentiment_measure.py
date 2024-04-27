@@ -1,6 +1,8 @@
 import math
 
 import numpy
+
+from activation import none, tanh, sig
 from network import Network
 
 # labels
@@ -115,8 +117,8 @@ assert len(review_vectors) == len(scores)
 
 # select training data
 
-training_reviews = review_vectors[0:7000]
-training_scores = scores[0:7000]
+training_reviews = review_vectors[0:300]
+training_scores = scores[0:300]
 
 # training_reviews = review_vectors[0:3000]
 # training_scores = scores[0:3000]
@@ -133,7 +135,7 @@ print('Created test data')
 
 layers = [vocabulary_size, 4, 1]
 dropout = [0, 0]
-network = Network(layers, dropout, False)
+network = Network(layers, dropout, [none, tanh], False)
 
 print(f'test positives: {test_scores.count([1])}')
 print(f'test negatives: {test_scores.count([0])}')

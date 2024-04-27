@@ -1,4 +1,6 @@
 from unittest import TestCase
+
+from activation import none, relu, sig
 from network import Network
 
 
@@ -46,6 +48,10 @@ class TestNetwork(TestCase):
         # round matrices for float rounding error
         round_matrix(weights1_actual, 10)
         round_matrix(weights2_actual, 10)
+
+        print('act:')
+        for i in network.layers:
+            print(i.activation)
 
         self.assertEqual(weights1_expected, weights1_actual)
         self.assertEqual(weights2_expected, weights2_actual)
@@ -158,9 +164,9 @@ class TestNetwork(TestCase):
 
         outputs = [[1], [1], [0], [0]]
 
-        network = Network(layers, None, None, True)
+        network = Network(layers, None, [relu, relu, none], True)
 
-        for iteration in range(500):
+        for iteration in range(300):
             for i in range(0, len(inputs)):
                 network.learn(inputs[i], outputs[i])
 
@@ -187,7 +193,7 @@ class TestNetwork(TestCase):
 
         outputs = [[1], [1], [0], [0]]
 
-        network = Network(layers, dropout, True)
+        network = Network(layers, dropout, [relu, relu, none], True)
 
         for iteration in range(300):
             for i in range(0, len(inputs)):
@@ -204,7 +210,7 @@ class TestNetwork(TestCase):
         self.assertEqual(network.layers[0].dropout_rate, 0)
 
         layers = [3, 4, 2, 1]
-        network = Network(layers, [0.3, 0.4, 0.2], True)
+        network = Network(layers, [0.3, 0.4, 0.2], None, True)
 
         self.assertEqual(network.layers[0].dropout_rate, 0.3)
         self.assertEqual(network.layers[1].dropout_rate, 0.4)
@@ -212,7 +218,7 @@ class TestNetwork(TestCase):
         self.assertEqual(network.layers[3].dropout_rate, 0)
 
         layers = [3, 4, 2, 1]
-        network = Network(layers, [0.3, 0.4, 0.2], True)
+        network = Network(layers, [0.3, 0.4, 0.2], None, True)
 
         self.assertEqual(network.layers[0].dropout_rate, 0.3)
         self.assertEqual(network.layers[1].dropout_rate, 0.4)

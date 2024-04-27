@@ -1,4 +1,5 @@
 import math
+import copy
 from enum import Enum, auto
 
 import numpy
@@ -12,10 +13,12 @@ class ActivationType(Enum):
 # relu
 
 def relu(vector, activation):
+    vector_c = copy.deepcopy(vector)
+
     if activation == ActivationType.FUNCTION:
-        return __relu_vector(vector)
+        return __relu_vector(vector_c)
     elif activation == ActivationType.DERIVATIVE:
-        return __relu_deriv_vector(vector)
+        return __relu_deriv_vector(vector_c)
     else:
         print("Activation type not valid")
 
@@ -55,10 +58,12 @@ def __relu_deriv(x):
 # sigmoid
 
 def sig(vector, activation):
+    vector_c = copy.deepcopy(vector)
+
     if activation == ActivationType.FUNCTION:
-        return __sig_vector(vector)
+        return __sig_vector(vector_c)
     elif activation == ActivationType.DERIVATIVE:
-        return __sig_deriv_vector(vector)
+        return __sig_deriv_vector(vector_c)
     else:
         print("Activation type not valid")
 
@@ -88,13 +93,16 @@ def __sig(x):
 def __sig_deriv(x):
     return __sig(x) * (1 - __sig(x))
 
+
 # tanh
 
 def tanh(vector, activation):
+    vector_c = copy.deepcopy(vector)
+
     if activation == ActivationType.FUNCTION:
-        return __tanh_vector(vector)
+        return __tanh_vector(vector_c)
     elif activation == ActivationType.DERIVATIVE:
-        return __tanh_deriv_vector(vector)
+        return __tanh_deriv_vector(vector_c)
     else:
         print("Activation type not valid")
 
@@ -128,4 +136,16 @@ def __tanh_deriv(x):
 # none
 
 def none(vector, activation):
-    return vector
+    vector_c = copy.deepcopy(vector)
+
+    if activation == ActivationType.FUNCTION:
+        return vector_c
+    elif activation == ActivationType.DERIVATIVE:
+        # //todo: cleanup
+        if type(vector_c) == list and type(vector_c[0]) == list:
+            v_unbox = vector_c[0]
+            return [1] * len(v_unbox)
+        return [1] * len(vector_c)
+    else:
+        print("Activation type not valid")
+
