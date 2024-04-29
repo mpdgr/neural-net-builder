@@ -76,7 +76,7 @@ print(f'Nr of words with incidence >= 700: {count700}')
 print(f'Nr of words with incidence >= 1000: {count1000}')
 print(f'Nr of words with incidence >= 2000: {count2000}')
 
-vocabulary_list = list(key for key, value in vocabulary.items() if value >= 2000)
+vocabulary_list = list(key for key, value in vocabulary.items() if value >= 700)
 
 vocabulary_size = len(vocabulary_list)
 
@@ -141,7 +141,7 @@ print('Created test data')
 
 # create network
 
-layers = [vocabulary_size, 128, 64, 1]
+layers = [vocabulary_size, 512, 64, 1]
 dropout = [0.3, 0, 0]
 network = Network(layers, dropout, [sig, none, sig], False)
 
@@ -251,4 +251,15 @@ print(f'Uncertain rate: {verify.count(0)/len(verify)}')
 # dropout = [0.3, 0, 0]
 # network = Network(layers, dropout, [sig, none, sig], False)
 # vocabulary_list = list(key for key, value in vocabulary.items() if value >= 2000)
+
+# SUMARY:
+# Total learnig cases: 24000
+# Total testing cases: 1000
+# Total testing scores: 1000
+# Total success predictions: 820
+# Total failed predictions: 180
+# Total uncertain predictions: 0
+# Success rate: 0.82
+# Fail rate: 0.18
+# Uncertain rate: 0.0
 
