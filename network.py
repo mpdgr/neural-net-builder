@@ -98,6 +98,22 @@ class Network:
 
     def learn(self, inp, target):
         prediction = self.predict(inp, True)
+
+        # # testing--
+        # if type(prediction) == list:
+        #     prediction_net = prediction[0][0]
+        # else:
+        #     prediction_net = prediction
+        #
+        # if type(target) == list:
+        #     target_net = target[0]
+        # else:
+        #     target_net = target
+        #
+        # error = (prediction_net - target_net) * (prediction_net - target_net) * 0.5
+        # print(f'Error: {error}')
+        # # ---------
+
         delta = self.__comp_delta(prediction, target)
         self.back_propagate(delta)
         # self.print_weights()
@@ -105,7 +121,8 @@ class Network:
     # comp delta = prediction - expected value
     # result size = last layer node count
     def __comp_delta(self, prediction, target):
+        # todo: function approach
         delta = subtract_vectors(prediction, target)
-        if self.debug:
-            print(f"Delta: {delta}")
+        # if self.debug:
+        #     print(f"Delta: {delta}")
         return delta

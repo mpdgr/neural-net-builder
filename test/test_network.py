@@ -6,6 +6,39 @@ from network import Network
 
 class TestNetwork(TestCase):
 
+    def test_learn_2x2x1(self):
+        layers = [2, 2, 1]
+
+        inp = [2, 3]
+        target = [1]
+
+        weights1 = [
+            [0.11, 0.12],
+            [0.21, 0.08]
+        ]
+
+        weights2 = [
+            [0.14],
+            [0.15]
+        ]
+
+        network = Network(layers, None, None, True)
+        network.layers[1].weights = weights1
+        network.layers[2].weights = weights2
+
+        network = Network(layers, None, None, True)
+        network.layers[1].weights = weights1
+        network.layers[2].weights = weights2
+
+        print(f"Start weights: ")
+        network.print_weights()
+        network.learn(inp, target)
+        print(f"End weights: ")
+        network.print_weights()
+
+        network.learn(inp, target)
+
+
     def test_learn_2x2x2(self):
         layers = [2, 2, 2]
 

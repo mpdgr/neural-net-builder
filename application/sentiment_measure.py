@@ -2,7 +2,7 @@ import math
 
 import numpy
 
-from activation import none, tanh, sig
+from activation import none, tanh, sig, relu
 from network import Network
 
 # labels
@@ -60,6 +60,10 @@ count10 = sum(1 for value in vocabulary.values() if value >= 10)
 count20 = sum(1 for value in vocabulary.values() if value >= 20)
 count50 = sum(1 for value in vocabulary.values() if value >= 50)
 count100 = sum(1 for value in vocabulary.values() if value >= 100)
+count500 = sum(1 for value in vocabulary.values() if value >= 500)
+count700 = sum(1 for value in vocabulary.values() if value >= 700)
+count1000 = sum(1 for value in vocabulary.values() if value >= 1000)
+count2000 = sum(1 for value in vocabulary.values() if value >= 2000)
 
 print(f'Nr of words with any incidence: {count0}')
 print(f'Nr of words with incidence >= 5: {count5}')
@@ -67,8 +71,12 @@ print(f'Nr of words with incidence >= 10: {count10}')
 print(f'Nr of words with incidence >= 20: {count20}')
 print(f'Nr of words with incidence >= 50: {count50}')
 print(f'Nr of words with incidence >= 100: {count100}')
+print(f'Nr of words with incidence >= 500: {count500}')
+print(f'Nr of words with incidence >= 700: {count700}')
+print(f'Nr of words with incidence >= 1000: {count1000}')
+print(f'Nr of words with incidence >= 2000: {count2000}')
 
-vocabulary_list = list(key for key, value in vocabulary.items() if value >= 100)
+vocabulary_list = list(key for key, value in vocabulary.items() if value >= 2000)
 
 vocabulary_size = len(vocabulary_list)
 
@@ -117,8 +125,8 @@ assert len(review_vectors) == len(scores)
 
 # select training data
 
-training_reviews = review_vectors[0:300]
-training_scores = scores[0:300]
+training_reviews = review_vectors[0:24000]
+training_scores = scores[0:24000]
 
 # training_reviews = review_vectors[0:3000]
 # training_scores = scores[0:3000]
@@ -133,9 +141,9 @@ print('Created test data')
 
 # create network
 
-layers = [vocabulary_size, 4, 1]
-dropout = [0, 0]
-network = Network(layers, dropout, [none, tanh], False)
+layers = [vocabulary_size, 128, 64, 1]
+dropout = [0.3, 0, 0]
+network = Network(layers, dropout, [sig, none, sig], False)
 
 print(f'test positives: {test_scores.count([1])}')
 print(f'test negatives: {test_scores.count([0])}')
@@ -148,10 +156,15 @@ print(f'Train scores: {len(training_scores)}')
 iterations = len(training_reviews)
 iter_nr = 0
 
+# for i in range(iterations):
+#     network.learn(training_reviews[i], training_scores[i])
+#     print(f'Training iteration {iter_nr} of {iterations}')
+#     iter_nr += 1
+
 for i in range(iterations):
     network.learn(training_reviews[i], training_scores[i])
     print(f'Training iteration {iter_nr} of {iterations}')
-    iter_nr +=1
+    iter_nr += 1
 
 print('Learning finished')
 
@@ -164,10 +177,10 @@ for i in range(len(test_reviews)):
     print(f'Prediction: {predicted}')
     print(f'Actual: {test_scores[i]}')
 
-    if (real == [1] and predicted[0] > 0.1) or (real == [0] and predicted[0] < -0.1):
+    if (real == [1] and predicted[0] > 0.50) or (real == [0] and predicted[0] < 0.50):
         verify.append(1)
-    elif (predicted[0] <= 0.1) and (predicted[0] >= -0.1):
-        verify.append(0)
+    # elif (predicted[0] <= 0.6) and (predicted[0] >= 0.4):
+    #     verify.append(0)
     else:
         verify.append(-1)
 
@@ -184,10 +197,58 @@ print(f'Success rate: {verify.count(1)/len(verify)}')
 print(f'Fail rate: {verify.count(-1)/len(verify)}')
 print(f'Uncertain rate: {verify.count(0)/len(verify)}')
 
+# 3000 cases
+# layers = [vocabulary_size, 4, 1]
+# dropout = [0, 0]
+# network = Network(layers, dropout, [sig, sig], False)
+# words 500+
+# 75% accuracy (Success rate: 0.752)
+# alpha=0.1
+
+# 3000 cases
+# Success rate: 0.739
+# layers = [vocabulary_size, 80, 1]
+
+# SUMARY:
+# Total learnig cases: 5000
+# Total testing cases: 1000
+# Total testing scores: 1000
+# Total success predictions: 754
+# Total failed predictions: 246
+# Total uncertain predictions: 0
+# Success rate: 0.754
+# layers = [vocabulary_size, 80, 1]
+# dropout = [0, 0]
+# network = Network(layers, dropout, [sig, sig], False)
+# words 1000+
+# alpha=0.1
+
+
+# SUMARY:
+# Total learnig cases: 20000
+# Total testing cases: 1000
+# Total testing scores: 1000
+# Total success predictions: 751
+# Total failed predictions: 249
+# Total uncertain predictions: 0
+# Success rate: 0.751
+# alpha=0.1
 
 
 
-
-
-
+# SUMARY:
+# Total learnig cases: 20000
+# Total testing cases: 1000
+# Total testing scores: 1000
+# Total success predictions: 762
+# Total failed predictions: 238
+# Total uncertain predictions: 0
+# Success rate: 0.762
+# Fail rate: 0.238
+# Uncertain rate: 0.0
+# alpha=0.1
+# layers = [vocabulary_size, 128, 64, 1]
+# dropout = [0.3, 0, 0]
+# network = Network(layers, dropout, [sig, none, sig], False)
+# vocabulary_list = list(key for key, value in vocabulary.items() if value >= 2000)
 

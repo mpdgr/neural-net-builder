@@ -75,13 +75,16 @@ class Layer:
         #     print(f"Backpropagating deltas: {self.__back_deltas}")
         return self.__back_deltas
 
+    def local_delta(self):
+        return
+
     # comp prediction basing on input and weights, apply activation function
     # inp size = node_count
     def __predict(self, inp):
         self.__inp = inp
         self.__prediction = matrix_product(inp, self.weights)
-        if self.debug:
-            print(f"Prediction: {self.__prediction}")
+        # if self.debug:
+        #     print(f"Prediction: {self.__prediction}")
         return self.__prediction
 
     # comp weighted delta and apply alpha  = delta * input * alpha
@@ -122,10 +125,11 @@ class Layer:
 
     def init_random_weights(self):
         weights = []
+        random.seed(12121212)
         for r in range(self.input_count):
             row = []
             for n in range(self.node_count):
-                row.append(random.random())
+                row.append((random.random() - 0.5) * 0.5)
             weights.append(row)
 
         self.weights = weights

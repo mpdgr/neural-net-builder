@@ -23,11 +23,11 @@ def apply_dropout(dropout_rate, v):
 
     # dropout rate adjusted to real nr of elements
     actual_dropout_rate = drop / len(v)
-    print(actual_dropout_rate)
+    # print(actual_dropout_rate)
 
     drop_indices = random.sample(range(len(v)), drop)
 
-    print(drop_indices)
+    # print(drop_indices)
 
     dropout_vector = v.copy()
 
@@ -35,12 +35,12 @@ def apply_dropout(dropout_rate, v):
     for index in drop_indices:
         dropout_vector[index] = 0
 
-    print(dropout_vector)
+    # print(dropout_vector)
 
     # multiply vector elements (effectively remaining elements by actual dropout p
 
     adjusted_dropout_vector = vector_scalar_product(dropout_vector, 1 / (1 - actual_dropout_rate))
-    print(adjusted_dropout_vector)
+    # print(adjusted_dropout_vector)
 
     return adjusted_dropout_vector
 
