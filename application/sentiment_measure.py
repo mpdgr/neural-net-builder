@@ -197,61 +197,6 @@ print(f'Success rate: {verify.count(1)/len(verify)}')
 print(f'Fail rate: {verify.count(-1)/len(verify)}')
 print(f'Uncertain rate: {verify.count(0)/len(verify)}')
 
-# 3000 cases
-# layers = [vocabulary_size, 4, 1]
-# dropout = [0, 0]
-# network = Network(layers, dropout, [sig, sig], False)
-# words 500+
-# 75% accuracy (Success rate: 0.752)
-# alpha=0.1
-
-# 3000 cases
-# Success rate: 0.739
-# layers = [vocabulary_size, 80, 1]
-
-# SUMARY:
-# Total learnig cases: 5000
-# Total testing cases: 1000
-# Total testing scores: 1000
-# Total success predictions: 754
-# Total failed predictions: 246
-# Total uncertain predictions: 0
-# Success rate: 0.754
-# layers = [vocabulary_size, 80, 1]
-# dropout = [0, 0]
-# network = Network(layers, dropout, [sig, sig], False)
-# words 1000+
-# alpha=0.1
-
-
-# SUMARY:
-# Total learnig cases: 20000
-# Total testing cases: 1000
-# Total testing scores: 1000
-# Total success predictions: 751
-# Total failed predictions: 249
-# Total uncertain predictions: 0
-# Success rate: 0.751
-# alpha=0.1
-
-
-
-# SUMARY:
-# Total learnig cases: 20000
-# Total testing cases: 1000
-# Total testing scores: 1000
-# Total success predictions: 762
-# Total failed predictions: 238
-# Total uncertain predictions: 0
-# Success rate: 0.762
-# Fail rate: 0.238
-# Uncertain rate: 0.0
-# alpha=0.1
-# layers = [vocabulary_size, 128, 64, 1]
-# dropout = [0.3, 0, 0]
-# network = Network(layers, dropout, [sig, none, sig], False)
-# vocabulary_list = list(key for key, value in vocabulary.items() if value >= 2000)
-
 # SUMARY:
 # Total learnig cases: 24000
 # Total testing cases: 1000
@@ -262,4 +207,23 @@ print(f'Uncertain rate: {verify.count(0)/len(verify)}')
 # Success rate: 0.82
 # Fail rate: 0.18
 # Uncertain rate: 0.0
+# training_reviews = review_vectors[0:24000]
+# training_scores = scores[0:24000]
+#
+# # training_reviews = review_vectors[0:3000]
+# # training_scores = scores[0:3000]
+#
+# print('Created training data')
+#
+# # select test data
+# test_reviews = review_vectors[24000:25000]
+# test_scores = scores[24000:25000]
+#
+# print('Created test data')
+#
+# # create network
+#
+# layers = [vocabulary_size, 512, 64, 1]
+# dropout = [0.3, 0, 0]
+# network = Network(layers, dropout, [sig, none, sig], False)
 
