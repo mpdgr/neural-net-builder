@@ -76,7 +76,7 @@ print(f'Nr of words with incidence >= 700: {count700}')
 print(f'Nr of words with incidence >= 1000: {count1000}')
 print(f'Nr of words with incidence >= 2000: {count2000}')
 
-vocabulary_list = list(key for key, value in vocabulary.items() if value >= 700)
+vocabulary_list = list(key for key, value in vocabulary.items() if value >= 1000)
 
 vocabulary_size = len(vocabulary_list)
 
@@ -154,76 +154,95 @@ print(f'Train reviews: {len(training_reviews)}')
 print(f'Train scores: {len(training_scores)}')
 
 iterations = len(training_reviews)
-iter_nr = 0
+
 
 # for i in range(iterations):
 #     network.learn(training_reviews[i], training_scores[i])
 #     print(f'Training iteration {iter_nr} of {iterations}')
 #     iter_nr += 1
 
-for i in range(iterations):
-    network.learn(training_reviews[i], training_scores[i])
-    print(f'Training iteration {iter_nr} of {iterations}')
-    iter_nr += 1
+def learn_epoch(epoch_nr):
+    iter_nr = 0
 
-print('Learning finished')
+    for i in range(iterations):
+        network.learn(training_reviews[i], training_scores[i])
+        print(f'Training iteration {iter_nr} of {iterations}, epoch {epoch_nr}')
+        iter_nr += 1
+
+    print('Learning finished')
+
+    verify = []
+
+    for i in range(len(test_reviews)):
+        predicted = network.predict(test_reviews[i], False)
+        real = test_scores[i]
+        print(f'Prediction: {predicted}')
+        print(f'Actual: {test_scores[i]}')
+
+        if (real == [1] and predicted[0] > 0.50) or (real == [0] and predicted[0] < 0.50):
+            verify.append(1)
+        # elif (predicted[0] <= 0.6) and (predicted[0] >= 0.4):
+        #     verify.append(0)
+        else:
+            verify.append(-1)
+
+    print('--------------------------------------------------------')
+    print(f'Testing finished, epoch {epoch_nr} \n')
+    print('SUMARY:')
+    print(f'Total learnig cases: {len(training_reviews)}')
+    print(f'Total testing cases: {len(test_reviews)}')
+    print(f'Total testing scores: {len(verify)}')
+    print(f'Total success predictions: {verify.count(1)}')
+    print(f'Total failed predictions: {verify.count(-1)}')
+    print(f'Total uncertain predictions: {verify.count(0)}')
+    print(f'Success rate: {verify.count(1) / len(verify)}')
+    print(f'Fail rate: {verify.count(-1) / len(verify)}')
+    print(f'Uncertain rate: {verify.count(0) / len(verify)}')
+    print('-------------------------------------------------------')
 
 
-verify = []
+for i in range(1, 4):
+    learn_epoch(i)
 
-for i in range(len(test_reviews)):
-    predicted = network.predict(test_reviews[i], False)
-    real = test_scores[i]
-    print(f'Prediction: {predicted}')
-    print(f'Actual: {test_scores[i]}')
-
-    if (real == [1] and predicted[0] > 0.50) or (real == [0] and predicted[0] < 0.50):
-        verify.append(1)
-    # elif (predicted[0] <= 0.6) and (predicted[0] >= 0.4):
-    #     verify.append(0)
-    else:
-        verify.append(-1)
-
-print('Testing finished')
-print('--------------------------------------------------------')
-print('SUMARY:')
-print(f'Total learnig cases: {len(training_reviews)}')
-print(f'Total testing cases: {len(test_reviews)}')
-print(f'Total testing scores: {len(verify)}')
-print(f'Total success predictions: {verify.count(1)}')
-print(f'Total failed predictions: {verify.count(-1)}')
-print(f'Total uncertain predictions: {verify.count(0)}')
-print(f'Success rate: {verify.count(1)/len(verify)}')
-print(f'Fail rate: {verify.count(-1)/len(verify)}')
-print(f'Uncertain rate: {verify.count(0)/len(verify)}')
-
+#
+# ---------------------------------------------------------------------------------------------------------------
+# Testing finished, epoch 1
 # SUMARY:
 # Total learnig cases: 24000
 # Total testing cases: 1000
 # Total testing scores: 1000
-# Total success predictions: 820
-# Total failed predictions: 180
+# Total success predictions: 781
+# Total failed predictions: 219
 # Total uncertain predictions: 0
-# Success rate: 0.82
-# Fail rate: 0.18
+# Success rate: 0.781
+# Fail rate: 0.219
 # Uncertain rate: 0.0
-# training_reviews = review_vectors[0:24000]
-# training_scores = scores[0:24000]
-#
-# # training_reviews = review_vectors[0:3000]
-# # training_scores = scores[0:3000]
-#
-# print('Created training data')
-#
-# # select test data
-# test_reviews = review_vectors[24000:25000]
-# test_scores = scores[24000:25000]
-#
-# print('Created test data')
-#
-# # create network
-#
-# layers = [vocabulary_size, 512, 64, 1]
-# dropout = [0.3, 0, 0]
-# network = Network(layers, dropout, [sig, none, sig], False)
+# -------------------------------------------------------
 
+# --------------------------------------------------------
+# Testing finished, epoch 2
+# SUMARY:
+# Total learnig cases: 24000
+# Total testing cases: 1000
+# Total testing scores: 1000
+# Total success predictions: 815
+# Total failed predictions: 185
+# Total uncertain predictions: 0
+# Success rate: 0.815
+# Fail rate: 0.185
+# Uncertain rate: 0.0
+# -------------------------------------------------------
+
+# --------------------------------------------------------
+# Testing finished, epoch 3
+# SUMARY:
+# Total learnig cases: 24000
+# Total testing cases: 1000
+# Total testing scores: 1000
+# Total success predictions: 806
+# Total failed predictions: 194
+# Total uncertain predictions: 0
+# Success rate: 0.806
+# Fail rate: 0.194
+# Uncertain rate: 0.0
+# -------------------------------------------------------
