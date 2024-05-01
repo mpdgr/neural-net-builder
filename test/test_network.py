@@ -1,4 +1,4 @@
-import logging
+import logging as log
 from unittest import TestCase
 
 from activation import none, relu, sig
@@ -6,6 +6,7 @@ from network import Network
 
 
 class TestNetwork(TestCase):
+    log.getLogger().setLevel(log.INFO)
 
     def test_learn_2x2x1(self):
         layers = [2, 2, 1]
@@ -31,10 +32,10 @@ class TestNetwork(TestCase):
         network.layers[1].weights = weights1
         network.layers[2].weights = weights2
 
-        print(f"Start weights: ")
+        log.info(f"Start weights: ")
         network.print_weights()
         network.learn(inp, target)
-        print(f"End weights: ")
+        log.info(f"End weights: ")
         network.print_weights()
 
         network.learn(inp, target)
@@ -60,10 +61,10 @@ class TestNetwork(TestCase):
         network.layers[1].weights = weights1
         network.layers[2].weights = weights2
 
-        print(f"Start weights: ")
+        log.info(f"Start weights: ")
         network.print_weights()
         network.learn(inp, target)
-        print(f"End weights: ")
+        log.info(f"End weights: ")
         network.print_weights()
 
         weights1_expected = [
@@ -83,9 +84,9 @@ class TestNetwork(TestCase):
         round_matrix(weights1_actual, 10)
         round_matrix(weights2_actual, 10)
 
-        print('act:')
+        log.info('act:')
         for i in network.layers:
-            print(i.activation)
+            log.info(i.activation)
 
         self.assertEqual(weights1_expected, weights1_actual)
         self.assertEqual(weights2_expected, weights2_actual)
@@ -105,10 +106,10 @@ class TestNetwork(TestCase):
         network = Network(layers, None, None, True)
         network.layers[1].weights = weights
 
-        print(f"Start weights: ")
+        log.info(f"Start weights: ")
         network.print_weights()
         network.learn(inp, target)
-        print(f"End weights: ")
+        log.info(f"End weights: ")
         network.print_weights()
 
         weights_expected = [
@@ -141,10 +142,10 @@ class TestNetwork(TestCase):
         network = Network(layers, None, None, True)
         network.layers[1].weights = weights
 
-        print(f"Start weights: ")
+        log.info(f"Start weights: ")
         network.print_weights()
         network.learn(inp, target)
-        print(f"End weights: ")
+        log.info(f"End weights: ")
         network.print_weights()
 
         weights_expected = [
@@ -204,17 +205,10 @@ class TestNetwork(TestCase):
             for i in range(0, len(inputs)):
                 network.learn(inputs[i], outputs[i])
 
-        for i in range(0, len(inputs)):
-            print(f"\n----->Prediction for: {inputs[i]}; expected: {outputs[i]}")
-            network.predict(inputs[i])
+        self.eval_prediction(network, inputs, outputs)
 
 
     def test_3x4x1_with_dropout(self):
-        # w miarę ok: 300 iteracji -> wynik zbliżony lub same 0
-        # layers = [3, 8, 2, 1]
-        # dropout = [0, 0.3, 0]
-        # dziala na relu
-        logging.getLogger().setLevel(logging.INFO)
 
         layers = [3, 8, 4, 4, 1]
         dropout = [0.3, 0, 0, 0]
@@ -230,13 +224,11 @@ class TestNetwork(TestCase):
 
         network = Network(layers, dropout, [relu, relu, none, none], True)
 
-        for iteration in range(300):
+        for iteration in range(400):
             for i in range(0, len(inputs)):
                 network.learn(inputs[i], outputs[i])
 
-        for i in range(0, len(inputs)):
-            print(f"\n----->Prediction for: {inputs[i]}; expected: {outputs[i]}")
-            network.predict(inputs[i])
+        self.eval_prediction(network, inputs, outputs)
 
     def test_dropout_set(self):
         layers = [3, 4, 2, 1]
@@ -260,8 +252,12 @@ class TestNetwork(TestCase):
         self.assertEqual(network.layers[2].dropout_rate, 0.2)
         self.assertEqual(network.layers[3].dropout_rate, 0)
 
-        layers = [3, 4, 2, 1]
-        network = Network(layers, [0.3, 0.4, 0.2, 0.3], True)
+    def eval_prediction(self, network, inputs, outputs):
+        for i in range(0, len(inputs)):
+            log.info(f"\n----->Predict for: {inputs[i]}; expected: {outputs[i]}")
+            prediction = network.predict(inputs[i])
+            log.info(f'Prediction: {prediction}')
+            self.assertEqual(outputs[i][0], round(prediction[0][0], 2))
 
 
 def round_matrix(matrix, precision):
