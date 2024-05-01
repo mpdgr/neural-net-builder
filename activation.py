@@ -2,8 +2,6 @@ import math
 import copy
 from enum import Enum, auto
 
-import numpy
-
 
 class ActivationType(Enum):
     FUNCTION = auto()
@@ -126,7 +124,7 @@ def __tanh_deriv_vector(v):
 
 
 def __tanh(x):
-    return (2 / (1 + numpy.exp(-2 * x))) - 1
+    return (2 / (1 + math.exp(-2 * x))) - 1
 
 
 def __tanh_deriv(x):

@@ -1,8 +1,5 @@
-import logging
-import math
 import logging as log
 
-import numpy
 
 from activation import none, tanh, sig, relu
 from network import Network
@@ -10,6 +7,7 @@ from network import Network
 # labels
 # scores_path = "data/labels_test.txt"
 # reviews_path = "data/reviews_test.txt"
+log.getLogger().setLevel(log.INFO)
 
 scores_path = "data/labels.txt"
 reviews_path = "data/reviews.txt"
@@ -94,7 +92,7 @@ review_vectors = []
 # create review vector
 
 for review in reviews:
-    review_vector = numpy.zeros(vocabulary_size)
+    review_vector = [0] * vocabulary_size
     review_words = review.split(" ")
 
     for word in review_words:
