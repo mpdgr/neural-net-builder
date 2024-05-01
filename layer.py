@@ -44,6 +44,16 @@ class Layer:
             self.init_random_weights()
 
     def forward_pass(self, inp, training=False):
+        # for input layer input is forwarded directly eventually after applying dropout
+        if self.location == Layer.Location.INPUT and training:
+            self.__prediction = apply_dropout(self.dropout_rate, inp)
+            log.debug(f"Forwarding prediction: {self.__prediction}")
+            return self.__prediction
+        elif self.location == Layer.Location.INPUT:
+            self.__prediction = inp
+            log.debug(f"Forwarding prediction: {self.__prediction}")
+            return self.__prediction
+
         # raw prediction for each node
         raw_prediction = self.__predict(inp)
         if training:

@@ -72,17 +72,9 @@ class Network:
 
     # for inference phase set training to false
     def predict(self, inp, training=False):
-        # apply dropout for input layer if needed
-        if training:
-            next_input = dropout.apply_dropout(self.layers[0].dropout_rate, inp)
-        else:
-            next_input = inp
-
-        # continue prediction for following layers
-        prediction = None
-        for i in range(1, self.layers_count):
-            prediction = self.layers[i].forward_pass(next_input, training)
-            next_input = prediction
+        prediction = inp
+        for i in range(0, self.layers_count):
+            prediction = self.layers[i].forward_pass(prediction, training)
         return prediction
 
     def back_propagate(self, deltas):
@@ -99,22 +91,6 @@ class Network:
 
     def learn(self, inp, target):
         prediction = self.predict(inp, True)
-
-        # # testing--
-        # if type(prediction) == list:
-        #     prediction_net = prediction[0][0]
-        # else:
-        #     prediction_net = prediction
-        #
-        # if type(target) == list:
-        #     target_net = target[0]
-        # else:
-        #     target_net = target
-        #
-        # error = (prediction_net - target_net) * (prediction_net - target_net) * 0.5
-        # print(f'Error: {error}')
-        # # ---------
-
         delta = self.__comp_delta(prediction, target)
         self.back_propagate(delta)
         if log.getLogger().getEffectiveLevel() == log.DEBUG:
