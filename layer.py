@@ -2,6 +2,7 @@ import random
 from activation import *
 from dropout import *
 from util.matrix_util import *
+import logging as log
 
 
 class Layer:
@@ -54,8 +55,7 @@ class Layer:
         # apply activation function
         if self.activation is not None:
             self.__prediction = self.activation(raw_prediction, ActivationType.FUNCTION)
-        # if self.debug:
-        #     print(f"Forwarding prediction: {self.__prediction}")
+        log.debug(f"Forwarding prediction: {self.__prediction}")
         return self.__prediction
 
     def backward_pass(self, delta):
@@ -71,8 +71,7 @@ class Layer:
         self.__comp_weight_delta()
         self.__comp_back_deltas()
         self.__adjust_weights()
-        # if self.debug:
-        #     print(f"Backpropagating deltas: {self.__back_deltas}")
+        log.debug(f"Backpropagating deltas: {self.__back_deltas}")
         return self.__back_deltas
 
     def local_delta(self):
@@ -83,32 +82,27 @@ class Layer:
     def __predict(self, inp):
         self.__inp = inp
         self.__prediction = matrix_product(inp, self.weights)
-        # if self.debug:
-        #     print(f"Prediction: {self.__prediction}")
+        log.debug(f"Prediction: {self.__prediction}")
         return self.__prediction
 
     # comp weighted delta and apply alpha  = delta * input * alpha
     def __comp_weight_delta(self):
         self.__weighted_delta = vector_outer_product(self.__inp, self.__delta)
         self.__weighted_delta_alpha = matrix_scalar_product(self.__weighted_delta, self.__alpha)
-        # if self.debug:
-        #     print(f"Weighted delta alpha {self.__weighted_delta_alpha}")
+        log.debug(f"Weighted delta alpha {self.__weighted_delta_alpha}")
 
     # comp summed deltas to back propagate to each of input nodes
     # -> sum of delta shares for each input nodes
     def __comp_back_deltas(self):
         deltas_share_nodes_matrix = matrix_product(self.weights, transpose_matrix(self.__delta))
         self.__back_deltas = matrix_to_vector_row_major(deltas_share_nodes_matrix)
-        # if self.debug:
-        #     print(f"Delta shares for input nodes: {self.__back_deltas}")
+        log.debug(f"Delta shares for input nodes: {self.__back_deltas}")
 
     # adjust weights - subtract weighted deltas from respective weights
     def __adjust_weights(self):
-        # if self.debug:
-        #     print(f"Starting weights: {self.weights}")
+        log.debug(f"Weights before update: {self.weights}")
         self.weights = subtract_matrices(self.weights, self.__weighted_delta_alpha)
-        # if self.debug:
-        #     print(f"Weights after correction weights: {self.weights}")
+        log.debug(f"Weights after update: {self.weights}")
 
     # node x input
     def init_constant_weights(self, const):
@@ -120,8 +114,7 @@ class Layer:
             weights.append(row)
 
         self.weights = weights
-        if self.debug:
-            print(f"Initialized weights: {self.weights}")
+        log.debug(f"Initialized weights: {self.weights}")
 
     def init_random_weights(self):
         weights = []
@@ -133,5 +126,4 @@ class Layer:
             weights.append(row)
 
         self.weights = weights
-        if self.debug:
-            print(f"Initialized weights: {self.weights}")
+        log.debug(f"Initialized weights: {self.weights}")

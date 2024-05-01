@@ -1,4 +1,6 @@
 import dropout
+import logging as log
+
 from layer import Layer
 from util.matrix_util import subtract_vectors
 from activation import *
@@ -25,7 +27,7 @@ class Network:
             print("Network must include at lease two layers")
             return
 
-        print(f"Initializing network - layers count: {layers_count}")
+        log.info(f"Initializing network - layers count: {layers_count}")
 
         # init layers
         layers = []
@@ -65,9 +67,8 @@ class Network:
         self.activation = activation
         self.debug = debug
 
-        if debug:
-            layers_info = [f"[{layer.input_count}, {layer.node_count}]" for layer in self.layers]
-            print(f"Initialized network with layers: {', '.join(layers_info)}")
+        layers_info = [f"[{layer.input_count}, {layer.node_count}]" for layer in self.layers]
+        log.info(f"Initialized network with layers: {', '.join(layers_info)}")
 
     # for inference phase set training to false
     def predict(self, inp, training=False):
@@ -92,8 +93,8 @@ class Network:
 
     def print_weights(self):
         for layer in self.layers:
-            print(layer.location)
             if layer.location is not Layer.Location.INPUT:
+                print(layer.location)
                 print(layer.weights)
 
     def learn(self, inp, target):
@@ -116,13 +117,13 @@ class Network:
 
         delta = self.__comp_delta(prediction, target)
         self.back_propagate(delta)
-        # self.print_weights()
+        if log.getLogger().getEffectiveLevel() == log.DEBUG:
+            self.print_weights()
 
     # comp delta = prediction - expected value
     # result size = last layer node count
     def __comp_delta(self, prediction, target):
         # todo: function approach
         delta = subtract_vectors(prediction, target)
-        # if self.debug:
-        #     print(f"Delta: {delta}")
+        log.debug(f"Delta: {delta}")
         return delta

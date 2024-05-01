@@ -1,4 +1,6 @@
+import logging
 import math
+import logging as log
 
 import numpy
 
@@ -26,7 +28,7 @@ reviews_count = len(reviews)
 
 assert len(scores) == reviews_count
 
-print(f'Reviews nr: {reviews_count}')
+log.info(f'Reviews nr: {reviews_count}')
 
 reviews_scores = []
 
@@ -76,7 +78,7 @@ print(f'Nr of words with incidence >= 700: {count700}')
 print(f'Nr of words with incidence >= 1000: {count1000}')
 print(f'Nr of words with incidence >= 2000: {count2000}')
 
-vocabulary_list = list(key for key, value in vocabulary.items() if value >= 1000)
+vocabulary_list = list(key for key, value in vocabulary.items() if value >= 2000)
 
 vocabulary_size = len(vocabulary_list)
 
@@ -125,8 +127,8 @@ assert len(review_vectors) == len(scores)
 
 # select training data
 
-training_reviews = review_vectors[0:24000]
-training_scores = scores[0:24000]
+training_reviews = review_vectors[0:2000]
+training_scores = scores[0:2000]
 
 # training_reviews = review_vectors[0:3000]
 # training_scores = scores[0:3000]
@@ -141,9 +143,9 @@ print('Created test data')
 
 # create network
 
-layers = [vocabulary_size, 512, 64, 1]
-dropout = [0.3, 0, 0]
-network = Network(layers, dropout, [sig, none, sig], False)
+layers = [vocabulary_size, 128, 1]
+dropout = [0.3, 0]
+network = Network(layers, dropout, [sig, sig], False)
 
 print(f'test positives: {test_scores.count([1])}')
 print(f'test negatives: {test_scores.count([0])}')
@@ -201,48 +203,29 @@ def learn_epoch(epoch_nr):
     print('-------------------------------------------------------')
 
 
-for i in range(1, 4):
+for i in range(1, 2):
     learn_epoch(i)
 
-#
-# ---------------------------------------------------------------------------------------------------------------
+# TESTING SETUP, EXPECTED:
+# --------------------------------------------------------
 # Testing finished, epoch 1
 # SUMARY:
-# Total learnig cases: 24000
+# Total learnig cases: 2000
 # Total testing cases: 1000
 # Total testing scores: 1000
-# Total success predictions: 781
-# Total failed predictions: 219
+# Total success predictions: 720
+# Total failed predictions: 280
 # Total uncertain predictions: 0
-# Success rate: 0.781
-# Fail rate: 0.219
+# Success rate: 0.72
+# Fail rate: 0.28
 # Uncertain rate: 0.0
 # -------------------------------------------------------
+#
+#
+#
+#
+#
+#
 
-# --------------------------------------------------------
-# Testing finished, epoch 2
-# SUMARY:
-# Total learnig cases: 24000
-# Total testing cases: 1000
-# Total testing scores: 1000
-# Total success predictions: 815
-# Total failed predictions: 185
-# Total uncertain predictions: 0
-# Success rate: 0.815
-# Fail rate: 0.185
-# Uncertain rate: 0.0
-# -------------------------------------------------------
 
-# --------------------------------------------------------
-# Testing finished, epoch 3
-# SUMARY:
-# Total learnig cases: 24000
-# Total testing cases: 1000
-# Total testing scores: 1000
-# Total success predictions: 806
-# Total failed predictions: 194
-# Total uncertain predictions: 0
-# Success rate: 0.806
-# Fail rate: 0.194
-# Uncertain rate: 0.0
-# -------------------------------------------------------
+
