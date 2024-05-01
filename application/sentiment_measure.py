@@ -45,7 +45,7 @@ vocabulary = dict()
 for review in reviews:
     vocabulary_raw.extend(review.split(" "))
 
-print(f'Created raw set of {len(vocabulary_raw)} words')
+log.info(f'Created raw set of {len(vocabulary_raw)} words')
 
 for item in vocabulary_raw:
     if len(item.strip()) > 1:
@@ -54,7 +54,7 @@ for item in vocabulary_raw:
         else:
             vocabulary[item.strip()] = vocabulary[item.strip()] + 1
 
-print(f'Created cleaned map of {len(vocabulary.keys())}')
+log.info(f'Created cleaned map of {len(vocabulary.keys())}')
 
 count0 = sum(1 for value in vocabulary.values() if value > 0)
 count5 = sum(1 for value in vocabulary.values() if value >= 5)
@@ -67,22 +67,22 @@ count700 = sum(1 for value in vocabulary.values() if value >= 700)
 count1000 = sum(1 for value in vocabulary.values() if value >= 1000)
 count2000 = sum(1 for value in vocabulary.values() if value >= 2000)
 
-print(f'Nr of words with any incidence: {count0}')
-print(f'Nr of words with incidence >= 5: {count5}')
-print(f'Nr of words with incidence >= 10: {count10}')
-print(f'Nr of words with incidence >= 20: {count20}')
-print(f'Nr of words with incidence >= 50: {count50}')
-print(f'Nr of words with incidence >= 100: {count100}')
-print(f'Nr of words with incidence >= 500: {count500}')
-print(f'Nr of words with incidence >= 700: {count700}')
-print(f'Nr of words with incidence >= 1000: {count1000}')
-print(f'Nr of words with incidence >= 2000: {count2000}')
+log.info(f'Nr of words with any incidence: {count0}')
+log.info(f'Nr of words with incidence >= 5: {count5}')
+log.info(f'Nr of words with incidence >= 10: {count10}')
+log.info(f'Nr of words with incidence >= 20: {count20}')
+log.info(f'Nr of words with incidence >= 50: {count50}')
+log.info(f'Nr of words with incidence >= 100: {count100}')
+log.info(f'Nr of words with incidence >= 500: {count500}')
+log.info(f'Nr of words with incidence >= 700: {count700}')
+log.info(f'Nr of words with incidence >= 1000: {count1000}')
+log.info(f'Nr of words with incidence >= 2000: {count2000}')
 
 vocabulary_list = list(key for key, value in vocabulary.items() if value >= 2000)
 
 vocabulary_size = len(vocabulary_list)
 
-print(f'Nr of words in vocabulary: {vocabulary_size}')
+log.info(f'Nr of words in vocabulary: {vocabulary_size}')
 
 word_index = dict()
 
@@ -103,12 +103,12 @@ for review in reviews:
 
     review_vectors.append(review_vector)
 
-# print(review_vectors[0])
+# log.info(review_vectors[0])
 
 assert len(review_vectors) == reviews_count
 
-print(f'Nr of words in training set: {reviews_count}')
-print(f'Datapoint length: {len(review_vectors[0])}')
+log.info(f'Nr of words in training set: {reviews_count}')
+log.info(f'Datapoint length: {len(review_vectors[0])}')
 
 
 def map_score(label):
@@ -118,7 +118,7 @@ def map_score(label):
         return [0]
 
 
-print('Mapped scores')
+log.info('Mapped scores')
 
 # create scores vector
 scores = list(map(lambda p: map_score(p), scores))
@@ -133,13 +133,13 @@ training_scores = scores[0:2000]
 # training_reviews = review_vectors[0:3000]
 # training_scores = scores[0:3000]
 
-print('Created training data')
+log.info('Created training data')
 
 # select test data
 test_reviews = review_vectors[24000:25000]
 test_scores = scores[24000:25000]
 
-print('Created test data')
+log.info('Created test data')
 
 # create network
 
@@ -147,20 +147,20 @@ layers = [vocabulary_size, 128, 1]
 dropout = [0.3, 0]
 network = Network(layers, dropout, [sig, sig], False)
 
-print(f'test positives: {test_scores.count([1])}')
-print(f'test negatives: {test_scores.count([0])}')
+log.info(f'test positives: {test_scores.count([1])}')
+log.info(f'test negatives: {test_scores.count([0])}')
 
-print('Network ready')
+log.info('Network ready')
 
-print(f'Train reviews: {len(training_reviews)}')
-print(f'Train scores: {len(training_scores)}')
+log.info(f'Train reviews: {len(training_reviews)}')
+log.info(f'Train scores: {len(training_scores)}')
 
 iterations = len(training_reviews)
 
 
 # for i in range(iterations):
 #     network.learn(training_reviews[i], training_scores[i])
-#     print(f'Training iteration {iter_nr} of {iterations}')
+#     log.info(f'Training iteration {iter_nr} of {iterations}')
 #     iter_nr += 1
 
 def learn_epoch(epoch_nr):
@@ -168,39 +168,36 @@ def learn_epoch(epoch_nr):
 
     for i in range(iterations):
         network.learn(training_reviews[i], training_scores[i])
-        print(f'Training iteration {iter_nr} of {iterations}, epoch {epoch_nr}')
+        log.info(f'Training iteration {iter_nr} of {iterations}, epoch {epoch_nr}')
         iter_nr += 1
 
-    print('Learning finished')
+    log.info('Learning finished')
 
     verify = []
 
     for i in range(len(test_reviews)):
         predicted = network.predict(test_reviews[i], False)
         real = test_scores[i]
-        print(f'Prediction: {predicted}')
-        print(f'Actual: {test_scores[i]}')
+        log.info(f'Prediction: {predicted}')
+        log.info(f'Actual: {test_scores[i]}')
 
         if (real == [1] and predicted[0] > 0.50) or (real == [0] and predicted[0] < 0.50):
             verify.append(1)
-        # elif (predicted[0] <= 0.6) and (predicted[0] >= 0.4):
-        #     verify.append(0)
         else:
             verify.append(-1)
 
-    print('--------------------------------------------------------')
-    print(f'Testing finished, epoch {epoch_nr} \n')
-    print('SUMARY:')
-    print(f'Total learnig cases: {len(training_reviews)}')
-    print(f'Total testing cases: {len(test_reviews)}')
-    print(f'Total testing scores: {len(verify)}')
-    print(f'Total success predictions: {verify.count(1)}')
-    print(f'Total failed predictions: {verify.count(-1)}')
-    print(f'Total uncertain predictions: {verify.count(0)}')
-    print(f'Success rate: {verify.count(1) / len(verify)}')
-    print(f'Fail rate: {verify.count(-1) / len(verify)}')
-    print(f'Uncertain rate: {verify.count(0) / len(verify)}')
-    print('-------------------------------------------------------')
+    log.info('--------------------------------------------------------')
+    log.info(f'Testing finished, epoch {epoch_nr} \n')
+    log.info('SUMARY:')
+    log.info(f'Total learnig cases: {len(training_reviews)}')
+    log.info(f'Total testing cases: {len(test_reviews)}')
+    log.info(f'Total testing scores: {len(verify)}')
+    log.info(f'Total success predictions: {verify.count(1)}')
+    log.info(f'Total failed predictions: {verify.count(-1)}')
+    log.info(f'Total uncertain predictions: {verify.count(0)}')
+    log.info(f'Success rate: {verify.count(1) / len(verify)}')
+    log.info(f'Fail rate: {verify.count(-1) / len(verify)}')
+    log.info('-------------------------------------------------------')
 
 
 for i in range(1, 2):
