@@ -214,10 +214,10 @@ class TestNetwork(TestCase):
         # layers = [3, 8, 2, 1]
         # dropout = [0, 0.3, 0]
         # dziala na relu
-        logging.getLogger().setLevel(logging.DEBUG)
+        logging.getLogger().setLevel(logging.INFO)
 
-        layers = [3, 8, 2, 2, 1]
-        dropout = [0, 0.3, 0, 0]
+        layers = [3, 8, 4, 4, 1]
+        dropout = [0.3, 0, 0, 0]
 
         inputs = [
             [1, 0, 1],
