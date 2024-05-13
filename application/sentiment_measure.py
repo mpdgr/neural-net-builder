@@ -76,7 +76,7 @@ log.info(f'Nr of words with incidence >= 700: {count700}')
 log.info(f'Nr of words with incidence >= 1000: {count1000}')
 log.info(f'Nr of words with incidence >= 2000: {count2000}')
 
-vocabulary_list = list(key for key, value in vocabulary.items() if value >= 2000)
+vocabulary_list = list(key for key, value in vocabulary.items() if value >= 700)
 
 vocabulary_size = len(vocabulary_list)
 
@@ -125,8 +125,8 @@ assert len(review_vectors) == len(scores)
 
 # select training data
 
-training_reviews = review_vectors[0:2000]
-training_scores = scores[0:2000]
+training_reviews = review_vectors[0:24000]
+training_scores = scores[0:24000]
 
 # training_reviews = review_vectors[0:3000]
 # training_scores = scores[0:3000]
@@ -141,8 +141,8 @@ log.info('Created test data')
 
 # create network
 
-layers = [vocabulary_size, 128, 1]
-dropout = [0.3, 0]
+layers = [vocabulary_size, 512, 1]
+dropout = [0, 0.3]
 network = Network(layers, dropout, [sig, sig], False)
 
 log.info(f'test positives: {test_scores.count([1])}')
@@ -201,26 +201,41 @@ def learn_epoch(epoch_nr):
 for i in range(1, 2):
     learn_epoch(i)
 
-# TESTING SETUP, EXPECTED:
-# --------------------------------------------------------
-# Testing finished, epoch 1
-# SUMARY:
-# Total learnig cases: 2000
-# Total testing cases: 1000
-# Total testing scores: 1000
-# Total success predictions: 720
-# Total failed predictions: 280
-# Total uncertain predictions: 0
-# Success rate: 0.72
-# Fail rate: 0.28
-# Uncertain rate: 0.0
-# -------------------------------------------------------
+# INFO:root:Testing finished, epoch 1
+# INFO:root:SUMARY:
+# INFO:root:Total learnig cases: 24000
+# INFO:root:Total testing cases: 1000
+# INFO:root:Total testing scores: 1000
+# INFO:root:Total success predictions: 829
+# INFO:root:Total failed predictions: 171
+# INFO:root:Total uncertain predictions: 0
+# INFO:root:Success rate: 0.829
+# INFO:root:Fail rate: 0.171
 #
+# INFO:root:Testing finished, epoch 2
+# INFO:root:SUMARY:
+# INFO:root:Total learnig cases: 24000
+# INFO:root:Total testing cases: 1000
+# INFO:root:Total testing scores: 1000
+# INFO:root:Total success predictions: 827
+# INFO:root:Total failed predictions: 173
+# INFO:root:Total uncertain predictions: 0
+# INFO:root:Success rate: 0.827
+# INFO:root:Fail rate: 0.173
+# INFO:root:-------------------------------------------------------
 #
+# INFO:root:--------------------------------------------------------
+# INFO:root:Testing finished, epoch 3
+# INFO:root:SUMARY:
+# INFO:root:Total learnig cases: 24000
+# INFO:root:Total testing cases: 1000
+# INFO:root:Total testing scores: 1000
+# INFO:root:Total success predictions: 827
+# INFO:root:Total failed predictions: 173
+# INFO:root:Total uncertain predictions: 0
+# INFO:root:Success rate: 0.827
+# INFO:root:Fail rate: 0.173
+# INFO:root:-------------------------------------------------------
 #
-#
-#
-#
-
 
 
