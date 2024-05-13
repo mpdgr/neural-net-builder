@@ -22,6 +22,7 @@ class Layer:
     __weighted_delta_alpha = None
     __deltas_share = None
     __back_deltas = None
+    __drop_indices = None
     __inp = None
     __alpha = None
     activation = None
@@ -46,7 +47,8 @@ class Layer:
     def forward_pass(self, inp, training=False):
         # for input layer input is forwarded directly eventually after applying dropout
         if self.location == Layer.Location.INPUT and training:
-            self.__prediction = apply_dropout(self.dropout_rate, inp)
+            v, a = apply_dropout(self.dropout_rate, inp)
+            self.__prediction = v
             log.debug(f"Forwarding prediction: {self.__prediction}")
             return self.__prediction
         elif self.location == Layer.Location.INPUT:
@@ -54,17 +56,21 @@ class Layer:
             log.debug(f"Forwarding prediction: {self.__prediction}")
             return self.__prediction
 
-        # raw prediction for each node
+        # for remaining layers:
+        # compute raw/net prediction for each node
         raw_prediction = self.__predict(inp)
-        if training:
-            # print("training")
-            raw_prediction = apply_dropout(self.dropout_rate, raw_prediction)
-        # todo: clean updating predictions
         self.__raw_prediction = raw_prediction
-        self.__prediction = raw_prediction
+
         # apply activation function
-        if self.activation is not None:
-            self.__prediction = self.activation(raw_prediction, ActivationType.FUNCTION)
+        self.__prediction = self.activation(raw_prediction, ActivationType.FUNCTION)
+
+        # apply dropout
+        if training:
+            drop_prediction, drop_indices = apply_dropout(self.dropout_rate, self.__prediction)
+            self.__prediction = drop_prediction
+            self.__drop_indices = drop_indices
+        # todo: clean updating predictions
+
         log.debug(f"Forwarding prediction: {self.__prediction}")
         return self.__prediction
 
@@ -77,6 +83,11 @@ class Layer:
             # multiply deltas by derivatives
             adjusted_delta = vector_element_wise_product(delta, derivative_vector)
             self.__delta = adjusted_delta
+        # apply dropout
+
+        self.__delta = apply_gradient_dropout(self.__drop_indices, self.__delta)
+        # todo: dropout vector
+        # todo: dropout only in middle layers
         # weigh delta to adjust weights
         self.__comp_weight_delta()
         self.__comp_back_deltas()
