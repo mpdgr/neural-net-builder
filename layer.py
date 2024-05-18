@@ -87,7 +87,6 @@ class Layer:
 
         self.__delta = apply_gradient_dropout(self.__drop_indices, self.__delta)
         # todo: dropout vector
-        # todo: dropout only in middle layers
         # weigh delta to adjust weights
         self.__comp_weight_delta()
         self.__comp_back_deltas()
