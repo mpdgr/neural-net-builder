@@ -1,5 +1,10 @@
+import json
 import logging as log
+import time
+from datetime import datetime
+import jsonpickle
 
+from train_summary import *
 
 from activation import none, tanh, sig, relu
 from network import Network
@@ -164,14 +169,22 @@ iterations = len(training_reviews)
 def learn_epoch(epoch_nr):
     iter_nr = 0
 
+    start_time = int(time.time())
+
     for i in range(iterations):
         network.learn(training_reviews[i], training_scores[i])
         log.info(f'Training iteration {iter_nr} of {iterations}, epoch {epoch_nr}')
         iter_nr += 1
 
-    log.info('Learning finished')
+    finish_time = int(time.time())
+    total_time_sec = finish_time - start_time
+
+    log.info(f'Learning finished, epoch learning time: {total_time_sec} seconds')
+
 
     verify = []
+
+    confusion_matrix = {'true positive': 0, 'true negative': 0, 'false positive': 0, 'false negative': 0}
 
     for i in range(len(test_reviews)):
         predicted = network.predict(test_reviews[i], False)
@@ -179,27 +192,65 @@ def learn_epoch(epoch_nr):
         log.info(f'Prediction: {predicted}')
         log.info(f'Actual: {test_scores[i]}')
 
-        if (real == [1] and predicted[0] > 0.50) or (real == [0] and predicted[0] < 0.50):
+        if (real == [1] and predicted[0] >= 0.50):
             verify.append(1)
-        else:
+            confusion_matrix['true positive'] += 1
+        elif (real == [0] and predicted[0] < 0.50):
+            verify.append(1)
+            confusion_matrix['true negative'] += 1
+        elif (real == [1] and predicted[0] < 0.50):
             verify.append(-1)
+            confusion_matrix['false positive'] += 1
+        elif (real == [0] and predicted[0] >= 0.50):
+            verify.append(-1)
+            confusion_matrix['false negative'] += 1
+
+    summary = TrainSummary()
+    summary.epoch_nr = epoch_count
+    summary.learning_cases = len(training_reviews)
+    summary.test_cases = len(test_reviews)
+    summary.total_success_predictions = verify.count(1)
+    summary.total_failed_predictions = verify.count(-1)
+    summary.success_rate = verify.count(1) / len(verify)
+    summary.fail_rate = verify.count(-1) / len(verify)
+    summary.confusion_matrix = confusion_matrix
+    summary.training_time = total_time_sec
+    network.summary = summary
 
     log.info('--------------------------------------------------------')
-    log.info(f'Testing finished, epoch {epoch_nr} \n')
+    log.info(f'Testing finished, epoch {summary.epoch_nr} \n')
     log.info('SUMARY:')
-    log.info(f'Total learnig cases: {len(training_reviews)}')
-    log.info(f'Total testing cases: {len(test_reviews)}')
+    log.info(f'Total learning cases: {summary.learning_cases}')
+    log.info(f'Total testing cases: {summary.test_cases}')
     log.info(f'Total testing scores: {len(verify)}')
-    log.info(f'Total success predictions: {verify.count(1)}')
-    log.info(f'Total failed predictions: {verify.count(-1)}')
-    log.info(f'Total uncertain predictions: {verify.count(0)}')
-    log.info(f'Success rate: {verify.count(1) / len(verify)}')
-    log.info(f'Fail rate: {verify.count(-1) / len(verify)}')
+    log.info(f'Total success predictions: {summary.total_success_predictions}')
+    log.info(f'Total failed predictions: {summary.total_failed_predictions}')
+    log.info(f'Success rate: {summary.success_rate}')
+    log.info(f'Fail rate: {summary.fail_rate}')
+    log.info(f'Confusion matrix: {summary.confusion_matrix}')
+    log.info(f'Training time: {summary.training_time}')
     log.info('-------------------------------------------------------')
 
 
-for i in range(1, 2):
-    learn_epoch(i)
+def save_network_params(network):
+    current_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    path = f'networks/network_imdb_{current_time}.json'
+    network_json = jsonpickle.dumps(network.__dict__)
+
+    with open(path, 'w') as file:
+        file.write(network_json)
+
+    log.info(f'Network params saved to JSON')
+
+
+epoch_count = 1
+for i in range(0, epoch_count):
+    learn_epoch(i + 1)
+
+save_network_params(network)
+
+
+
 
 # INFO:root:Testing finished, epoch 1
 # INFO:root:SUMARY:
@@ -237,5 +288,3 @@ for i in range(1, 2):
 # INFO:root:Fail rate: 0.173
 # INFO:root:-------------------------------------------------------
 #
-
-
