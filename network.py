@@ -1,9 +1,8 @@
-import dropout
 import logging as log
 
-from layer import Layer
-from util.matrix_util import subtract_vectors
 from activation import *
+from layer import Layer
+from loss import *
 
 
 class Network:
@@ -17,6 +16,9 @@ class Network:
     # activation array
     # activation array length must equal layers array - 1 (no activation on input layer)
     activation = []
+
+    # loss function -> default: mse
+    loss = mse
 
     layers_count = None
     debug = False
@@ -67,6 +69,9 @@ class Network:
         self.activation = activation
         self.debug = debug
 
+        # mse - default loss function
+        self.loss = mse
+
         layers_info = [f"[{layer.input_count}, {layer.node_count}]" for layer in self.layers]
         log.info(f"Initialized network with layers: {', '.join(layers_info)}")
 
@@ -77,11 +82,11 @@ class Network:
             prediction = self.layers[i].forward_pass(prediction, training)
         return prediction
 
-    def back_propagate(self, deltas):
-        next_deltas = deltas
+    def back_propagate(self, gradient):
+        next_gradient = gradient
         for i in range(0, self.layers_count - 1):
-            next_deltas = self.layers[self.layers_count - i - 1].backward_pass(next_deltas)
-        return next_deltas
+            next_gradient = self.layers[self.layers_count - i - 1].backward_pass(next_gradient)
+        return next_gradient
 
     def print_weights(self):
         for layer in self.layers:
@@ -91,15 +96,13 @@ class Network:
 
     def learn(self, inp, target):
         prediction = self.predict(inp, True)
-        delta = self.__comp_delta(prediction, target)
-        self.back_propagate(delta)
+        loss_derivative = self.__comp_loss_derivative(target, prediction)
+        self.back_propagate(loss_derivative)
         if log.getLogger().getEffectiveLevel() == log.DEBUG:
             self.print_weights()
 
-    # comp delta = prediction - expected value
+    # comp loss derivative
     # result size = last layer node count
-    def __comp_delta(self, prediction, target):
-        # todo: function approach
-        delta = subtract_vectors(prediction, target)
-        log.debug(f"Delta: {delta}")
-        return delta
+    def __comp_loss_derivative(self, target, prediction):
+        return self.loss(target, prediction, LossType.DERIVATIVE)
+

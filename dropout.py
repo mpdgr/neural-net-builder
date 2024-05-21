@@ -47,8 +47,8 @@ def apply_dropout(dropout_rate, v):
     return adjusted_dropout_vector, drop_indices
 
 
-# --------------------------- apply dropout to gradient vector -------------------------
-def apply_gradient_dropout(drop_indices, v):
+# --------------------------- apply dropout in backpropagation -------------------------
+def apply_backprop_dropout(drop_indices, v):
     # zero gradients for dropped out neurons
     for i in drop_indices:
         v[i] = 0

@@ -1,5 +1,5 @@
 from unittest import TestCase
-from dropout import apply_dropout, apply_gradient_dropout
+from dropout import apply_dropout, apply_backprop_dropout
 
 
 class Test(TestCase):
@@ -85,7 +85,7 @@ class Test(TestCase):
         v = [2, 4, 6, 8, 10, 12]
         expected = [4, 0, 12, 0, 20, 0]
 
-        dropped_out = apply_gradient_dropout(drop_indices, v)
+        dropped_out = apply_backprop_dropout(drop_indices, v)
 
         print(dropped_out)
         print(f'sum{sum(v)}')
@@ -96,7 +96,7 @@ class Test(TestCase):
         v = [2, 4, 6, 8, 10, 12]
         expected = [2, 4, 6, 8, 10, 12]
 
-        dropped_out = apply_gradient_dropout(drop_indices, v)
+        dropped_out = apply_backprop_dropout(drop_indices, v)
 
         print(dropped_out)
         print(f'sum{sum(v)}')

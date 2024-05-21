@@ -15,22 +15,19 @@ class Layer:
     input_count = None
     location = None
     weights = None
+    activation = None
+    dropout_rate = 0
     __prediction = None
-    __raw_prediction = None
+    __net_prediction = None
     __delta = None
-    __weighted_delta = None
-    __weighted_delta_alpha = None
-    __deltas_share = None
-    __back_deltas = None
+    __gradient = None
+    __gradient_alpha = None
+    __loss_backprop = None
     __drop_indices = None
     __inp = None
     __alpha = None
-    activation = None
-    dropout_rate = 0
 
-    debug = True
-
-    def __init__(self, node_count, input_count, location, activation=None, weights="rand", alpha=0.1, debug=False):
+    def __init__(self, node_count, input_count, location, activation, weights="rand", alpha=0.1):
         self.node_count = node_count
         self.input_count = input_count
         self.location = location
@@ -38,7 +35,6 @@ class Layer:
         # todo: rand weight optional
         self.weights = weights
         self.__alpha = alpha
-        # self.__debug = debug
         if weights == "const":
             self.init_constant_weights(0.5)
         else:
@@ -59,7 +55,7 @@ class Layer:
         # for remaining layers:
         # compute raw/net prediction for each node
         raw_prediction = self.__predict(inp)
-        self.__raw_prediction = raw_prediction
+        self.__net_prediction = raw_prediction
 
         # apply activation function
         self.__prediction = self.activation(raw_prediction, ActivationType.FUNCTION)
@@ -74,28 +70,28 @@ class Layer:
         log.debug(f"Forwarding prediction: {self.__prediction}")
         return self.__prediction
 
-    def backward_pass(self, delta):
-        self.__delta = delta
+    def backward_pass(self, error):
         # apply activation function in backpropagation
-        if self.activation is not None:
-            # compute derivative for input
-            derivative_vector = self.activation(self.__raw_prediction, ActivationType.DERIVATIVE)
-            # multiply deltas by derivatives
-            adjusted_delta = vector_element_wise_product(delta, derivative_vector)
-            self.__delta = adjusted_delta
+        # compute derivative for net input
+        net_deriv = self.activation(self.__net_prediction, ActivationType.DERIVATIVE)
         # apply dropout
+        net_deriv = apply_backprop_dropout(self.__drop_indices, net_deriv)
+        # compute delta
+        self.__delta = vector_element_wise_product(error, net_deriv)
 
-        self.__delta = apply_gradient_dropout(self.__drop_indices, self.__delta)
-        # todo: dropout vector
-        # weigh delta to adjust weights
-        self.__comp_weight_delta()
-        self.__comp_back_deltas()
+        # compute gradient
+        self.__gradient = vector_outer_product(self.__inp, self.__delta)
+
+        # compute gradient adjusted with alpha
+        self.__gradient_alpha = matrix_scalar_product(self.__gradient, self.__alpha)
+
+        # compute loss to backpropagate
+        self.__comp_loss_shares()
+
         self.__adjust_weights()
-        log.debug(f"Backpropagating deltas: {self.__back_deltas}")
-        return self.__back_deltas
 
-    def local_delta(self):
-        return
+        log.debug(f"Backpropagating loss: {self.__loss_backprop}")
+        return self.__loss_backprop
 
     # comp prediction basing on input and weights, apply activation function
     # inp size = node_count
@@ -105,23 +101,16 @@ class Layer:
         log.debug(f"Prediction: {self.__prediction}")
         return self.__prediction
 
-    # comp weighted delta and apply alpha  = delta * input * alpha
-    def __comp_weight_delta(self):
-        self.__weighted_delta = vector_outer_product(self.__inp, self.__delta)
-        self.__weighted_delta_alpha = matrix_scalar_product(self.__weighted_delta, self.__alpha)
-        log.debug(f"Weighted delta alpha {self.__weighted_delta_alpha}")
+    # comp summed weight delta products to back propagate to each of input nodes
+    def __comp_loss_shares(self):
+        loss_share_matrix = matrix_product(self.weights, transpose_matrix(self.__delta))
+        self.__loss_backprop = matrix_to_vector_row_major(loss_share_matrix)
+        log.debug(f"Loss shares for input nodes: {self.__loss_backprop}")
 
-    # comp summed deltas to back propagate to each of input nodes
-    # -> sum of delta shares for each input nodes
-    def __comp_back_deltas(self):
-        deltas_share_nodes_matrix = matrix_product(self.weights, transpose_matrix(self.__delta))
-        self.__back_deltas = matrix_to_vector_row_major(deltas_share_nodes_matrix)
-        log.debug(f"Delta shares for input nodes: {self.__back_deltas}")
-
-    # adjust weights - subtract weighted deltas from respective weights
+    # adjust weights - subtract gradient alpha product from respective weights
     def __adjust_weights(self):
         log.debug(f"Weights before update: {self.weights}")
-        self.weights = subtract_matrices(self.weights, self.__weighted_delta_alpha)
+        self.weights = subtract_matrices(self.weights, self.__gradient_alpha)
         log.debug(f"Weights after update: {self.weights}")
 
     # node x input
