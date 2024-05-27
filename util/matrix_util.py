@@ -1,5 +1,5 @@
 #
-# MATRIX MULTIPLICATION UTILS
+# MATRIX/VECTOR  UTILS
 #
 
 # ------------------------------ product of two matrices -----------------------------

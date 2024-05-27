@@ -1,7 +1,8 @@
+import logging as log
+
 from activation import *
 from layer import Layer
 from loss import *
-import logging as log
 
 
 class Network:
@@ -9,22 +10,20 @@ class Network:
     Builds a dense neural network.
 
     To create a network define:
-    - nodes array: array size determines nr of layers and array[i] determines nr of parameters at given layer
-      ex. nodes = [50, 100, 10] for network of 3 layers of size 50, 100, 10 respectively
-    - dropout array: defines dropout rate at each layer except for output layer. Dropout layer size must equal
-      nodes array size - 1 (no dropout on output layer). If no param is used, no dropout is applied.
-      ex. dropout = [0, 0.3]
-    - activations array: defines activation function used at each layer except for input layer. Activations array size
-      must equal nodes array size - 1 (no activation on input layer). If no param is used, no activation is applied.
-      ex. activation = [sig, sig]
+    - nodes list: list size determines nr of layers and list[i] determines nr of parameters at given layer
+      ex. nodes = [50, 100, 10] for network of 3 layers of respectively 50, 100 and 10 neurons
+    - dropout list: defines dropout rate at each layer except for output layer. Dropout layer size must equal
+      nodes list size - 1 (no dropout on output layer). If no param is used, no dropout is applied.
+    - activations list: defines activation function used at each layer except for input layer. Activations list size
+      must equal nodes list size - 1 (no activation on input layer). If no param is used, no activation is applied.
 
     Example:
         network = Network([50, 100, 10], [0, 0.3], [sig, sig])
-        creates 3-layer network with input size of 50, middle layer of 100, output size 10,
-        with 0.3 dropout rate at middle layer and sigmoid activation on middle and output layers
+        creates 3-layer network with input size of 50, middle layer of 100 neurons, output size 10,
+        0.3 dropout rate at middle layer and sigmoid activation on middle and output layers
 
-    To train the network feed the learn function with input/target array pairs. Input array size must match nr of
-    parameters in input layer of the network and target array size must match nr of parameters in network output
+    To train the network feed the learn function with input/target list pairs. Input list size must match nr of
+    parameters in input layer of the network and target list size must match nr of parameters in network output
     layer.
 
     To use trained network, apply predict function to the input - input size must match nr of parameters in
@@ -33,13 +32,13 @@ class Network:
     By default, network uses mean square error as loss function and 0.1 alpha learning rate.
     """
 
-    # layers array
+    # layers list
     layers = []
 
-    # dropout array -> dropout rate at each layer
+    # dropout list -> dropout rate at each layer
     dropout = []
 
-    # activation array
+    # activation list
     activation = []
 
     # loss function -> default: mse
@@ -50,8 +49,7 @@ class Network:
     def __init__(self, nodes, dropout=None, activation=None):
         layers_count = len(nodes)
         if layers_count < 2:
-            print("Network must include at lease two layers")
-            return
+            raise InvalidArgumentException("Network must include at lease two layers")
 
         log.info(f"Initializing network - layers count: {layers_count}")
 
@@ -68,8 +66,7 @@ class Network:
         # set layers dropouts
         if dropout is not None:
             if len(dropout) != len(layers) - 1:
-                print("Dropout array length must equal layers array - 1")
-                return
+                raise InvalidArgumentException("Dropout list length must equal layers list - 1")
             else:
                 for i in range(layers_count - 1):
                     layers[i].dropout_rate = dropout[i]
@@ -77,8 +74,7 @@ class Network:
         # set activation functions
         if activation is not None:
             if len(activation) != len(layers) - 1:
-                print("Activation array length must equal layers array - 1")
-                return
+                raise InvalidArgumentException("Activation list length must equal layers list - 1")
             else:
                 layers[0].activation = none
                 for i in range(layers_count - 1):

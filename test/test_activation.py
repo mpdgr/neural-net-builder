@@ -53,8 +53,8 @@ class Test(TestCase):
         self.assertEqual(expected, round_vector(actual, 5))
 
     def test_activation_setting(self):
-        activation_array = [relu, sig, tanh, none]
-        network_activation = Network([3, 3, 3, 3, 3], None, activation_array)
+        activation = [relu, sig, tanh, none]
+        network_activation = Network([3, 3, 3, 3, 3], None, activation)
         activations_expected = [none, relu, sig, tanh, none]
         activations_actual = []
 

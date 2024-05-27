@@ -24,11 +24,11 @@ class TestNetwork(TestCase):
             [0.15]
         ]
 
-        network = Network(layers, None, None, True)
+        network = Network(layers, None, None)
         network.layers[1].weights = weights1
         network.layers[2].weights = weights2
 
-        network = Network(layers, None, None, True)
+        network = Network(layers, None, None)
         network.layers[1].weights = weights1
         network.layers[2].weights = weights2
 
@@ -57,7 +57,7 @@ class TestNetwork(TestCase):
             [3.5, 4]
         ]
 
-        network = Network(layers, None, None, True)
+        network = Network(layers, None, None)
         network.layers[1].weights = weights1
         network.layers[2].weights = weights2
 
@@ -103,7 +103,7 @@ class TestNetwork(TestCase):
             [3, 3.5]
         ]
 
-        network = Network(layers, None, None, True)
+        network = Network(layers, None, None)
         network.layers[1].weights = weights
 
         log.info(f"Start weights: ")
@@ -139,7 +139,7 @@ class TestNetwork(TestCase):
 
         expected = [1.6, 3.2, 4.8]
 
-        network = Network(layers, None, None, True)
+        network = Network(layers, None, None)
         network.layers[1].weights = weights
 
         log.info(f"Start weights: ")
@@ -179,7 +179,7 @@ class TestNetwork(TestCase):
             20, 40, 60, 80, 100
         ]
 
-        network = Network(layers, None, None, True)
+        network = Network(layers, None, None)
 
         network.learn(inp, target)
 
@@ -199,7 +199,7 @@ class TestNetwork(TestCase):
 
         outputs = [[1], [1], [0], [0]]
 
-        network = Network(layers, None, [relu, relu, none], True)
+        network = Network(layers, None, [relu, relu, none])
 
         for iteration in range(300):
             for i in range(0, len(inputs)):
@@ -222,7 +222,7 @@ class TestNetwork(TestCase):
 
         outputs = [[1], [1], [0], [0]]
 
-        network = Network(layers, dropout, [relu, relu, none, none], True)
+        network = Network(layers, dropout, [relu, relu, none, none])
 
         for iteration in range(400):
             for i in range(0, len(inputs)):
@@ -232,12 +232,12 @@ class TestNetwork(TestCase):
 
     def test_dropout_set(self):
         layers = [3, 4, 2, 1]
-        network = Network(layers, None, None, True)
+        network = Network(layers, None, None)
 
         self.assertEqual(network.layers[0].dropout_rate, 0)
 
         layers = [3, 4, 2, 1]
-        network = Network(layers, [0.3, 0.4, 0.2], None, True)
+        network = Network(layers, [0.3, 0.4, 0.2], None)
 
         self.assertEqual(network.layers[0].dropout_rate, 0.3)
         self.assertEqual(network.layers[1].dropout_rate, 0.4)
@@ -245,7 +245,7 @@ class TestNetwork(TestCase):
         self.assertEqual(network.layers[3].dropout_rate, 0)
 
         layers = [3, 4, 2, 1]
-        network = Network(layers, [0.3, 0.4, 0.2], None, True)
+        network = Network(layers, [0.3, 0.4, 0.2], None)
 
         self.assertEqual(network.layers[0].dropout_rate, 0.3)
         self.assertEqual(network.layers[1].dropout_rate, 0.4)

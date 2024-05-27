@@ -10,7 +10,7 @@ class Layer:
         HIDDEN = auto()
         OUTPUT = auto()
 
-    # layer characteristics
+    # layer parameters
     node_count = None
     input_count = None
     location = None
