@@ -5,8 +5,7 @@ from util.matrix_util import *
 
 # --------------------------- apply dropout to output vector ---------------------------
 def apply_dropout(dropout_rate, v):
-    # output of the function consists of tuple:
-    # (input vector after dropout, array indicating at which indices dropout was applied)
+    # returns tuple: (input vector after dropout, array indicating at which indices dropout was applied)
     if len(v) <= 1 and dropout_rate != 0:
         print("Output vector must consist of at least 2 elements")
         return v, []
@@ -53,9 +52,9 @@ def apply_backprop_dropout(drop_indices, v):
     for i in drop_indices:
         v[i] = 0
 
-    # verifiy actual dropout rate
+    # verify actual dropout rate
     dropout_rate = len(drop_indices) / len(v)
 
-    # increase remaimng gradients according to dropout rate
+    # increase remaining gradients according to dropout rate
     return [x if dropout_rate == 0 else x / dropout_rate for x in v]
 

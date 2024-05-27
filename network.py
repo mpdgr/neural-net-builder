@@ -1,29 +1,53 @@
-import logging as log
-
 from activation import *
 from layer import Layer
 from loss import *
+import logging as log
 
 
 class Network:
+    """
+    Builds a dense neural network.
+
+    To create a network define:
+    - nodes array: array size determines nr of layers and array[i] determines nr of parameters at given layer
+      ex. nodes = [50, 100, 10] for network of 3 layers of size 50, 100, 10 respectively
+    - dropout array: defines dropout rate at each layer except for output layer. Dropout layer size must equal
+      nodes array size - 1 (no dropout on output layer). If no param is used, no dropout is applied.
+      ex. dropout = [0, 0.3]
+    - activations array: defines activation function used at each layer except for input layer. Activations array size
+      must equal nodes array size - 1 (no activation on input layer). If no param is used, no activation is applied.
+      ex. activation = [sig, sig]
+
+    Example:
+        network = Network([50, 100, 10], [0, 0.3], [sig, sig])
+        creates 3-layer network with input size of 50, middle layer of 100, output size 10,
+        with 0.3 dropout rate at middle layer and sigmoid activation on middle and output layers
+
+    To train the network feed the learn function with input/target array pairs. Input array size must match nr of
+    parameters in input layer of the network and target array size must match nr of parameters in network output
+    layer.
+
+    To use trained network, apply predict function to the input - input size must match nr of parameters in
+    network input layer.
+
+    By default, network uses mean square error as loss function and 0.1 alpha learning rate.
+    """
+
     # layers array
     layers = []
 
-    # dropout array -> dropout rate at each node
-    # dropout array length must equal layers array - 1 (no dropout on output layer)
+    # dropout array -> dropout rate at each layer
     dropout = []
 
     # activation array
-    # activation array length must equal layers array - 1 (no activation on input layer)
     activation = []
 
     # loss function -> default: mse
     loss = mse
 
     layers_count = None
-    debug = False
 
-    def __init__(self, nodes, dropout=None, activation=None, debug=False):
+    def __init__(self, nodes, dropout=None, activation=None):
         layers_count = len(nodes)
         if layers_count < 2:
             print("Network must include at lease two layers")
@@ -67,7 +91,6 @@ class Network:
         self.layers_count = layers_count
         self.dropout = dropout
         self.activation = activation
-        self.debug = debug
 
         # mse - default loss function
         self.loss = mse
@@ -80,29 +103,23 @@ class Network:
         prediction = inp
         for i in range(0, self.layers_count):
             prediction = self.layers[i].forward_pass(prediction, training)
+        log.debug(f'Input: {inp} -> Prediction: {prediction}')
         return prediction
 
-    def back_propagate(self, gradient):
+    def learn(self, inp, target):
+        prediction = self.predict(inp, True)
+        loss_derivative = self.loss(target, prediction, LossType.DERIVATIVE)
+        self.__back_propagate(loss_derivative)
+
+    def __back_propagate(self, gradient):
         next_gradient = gradient
         for i in range(0, self.layers_count - 1):
             next_gradient = self.layers[self.layers_count - i - 1].backward_pass(next_gradient)
         return next_gradient
 
+    # for debugging
     def print_weights(self):
         for layer in self.layers:
             if layer.location is not Layer.Location.INPUT:
                 print(layer.location)
                 print(layer.weights)
-
-    def learn(self, inp, target):
-        prediction = self.predict(inp, True)
-        loss_derivative = self.__comp_loss_derivative(target, prediction)
-        self.back_propagate(loss_derivative)
-        if log.getLogger().getEffectiveLevel() == log.DEBUG:
-            self.print_weights()
-
-    # comp loss derivative
-    # result size = last layer node count
-    def __comp_loss_derivative(self, target, prediction):
-        return self.loss(target, prediction, LossType.DERIVATIVE)
-
